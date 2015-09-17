@@ -1,0 +1,44 @@
+{
+  "name": "triggmine/triggmine-sdk-php",
+  "homepage": "http://triggmine.com",
+  "description": "TriggMine SDK for PHP - Use TriggMine Services in your PHP project",
+  "keywords": ["triggmine","sdk"],
+  "type": "library",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "TriggMine",
+      "homepage": "http://triggmine.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.5",
+    "guzzlehttp/guzzle": "~5.3|~6.0.1|~6.1",
+    "guzzlehttp/psr7": "~1.0",
+    "guzzlehttp/promises": "~1.0",
+    "mtdowling/jmespath.php": "~2.2"
+  },
+  "require-dev": {
+    "ext-openssl": "*",
+    "ext-pcre": "*",
+    "ext-spl": "*",
+    "ext-json": "*",
+    "ext-dom": "*",
+    "ext-simplexml": "*",
+    "phpunit/phpunit": "~4.0",
+  },
+  "suggest": {
+    "ext-curl": "To send requests using cURL",
+  },
+  "autoload": {
+    "psr-4": {
+      "Triggmine\\": "src/"
+    },
+    "files": ["src/functions.php"]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Triggmine\\Test\\": "tests/"
+    }
+  },
+}
