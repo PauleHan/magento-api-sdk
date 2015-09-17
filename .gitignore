@@ -14,6 +14,7 @@
 
 # Sensitive or high-churn files:
 # .idea/dataSources.ids
+/composer.phar
 # .idea/dataSources.xml
 # .idea/sqlDataSources.xml
 # .idea/dynamic.xml

@@ -14,6 +14,10 @@ class Sdk
     /** @var  array Arguments for creating clients */
     private $args;
 
+    /**
+     * Builds Triggmine clients based on configuration settings.
+     *
+    */
     public function __construct(array $args = [])
     {
         $this->args = $args;
@@ -35,6 +39,15 @@ class Sdk
         throw new \BadMethodCallException("Unknown method: {$name}.");
     }
 
+    /**
+     * Get a client by name using an array of constructor options.
+     * @param string $name Service name or namespace
+     * @param array $args Arguments to configre the client
+     *
+     * @return TriggmineClientInterface
+     * @throw \InvalidArgumentException if any required option are missing or
+     *                                  the service is not supported.
+     */
     public function createClient($name, array $args = [])
     {
         // Get information about the service from manifest file
