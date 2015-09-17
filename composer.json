@@ -25,10 +25,10 @@
     "ext-json": "*",
     "ext-dom": "*",
     "ext-simplexml": "*",
-    "phpunit/phpunit": "~4.0",
+    "phpunit/phpunit": "~4.0"
   },
   "suggest": {
-    "ext-curl": "To send requests using cURL",
+    "ext-curl": "To send requests using cURL"
   },
   "autoload": {
     "psr-4": {
