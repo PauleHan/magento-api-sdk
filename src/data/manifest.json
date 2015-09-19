@@ -1,10 +1,7 @@
 {
   "e-commerce": {
     "namespace": "eCommerce",
-    "versions": {
-      "latest": "2015-10-01",
-      "2015-10-01" : "2015-10-01"
-    },
-    "suffix": "e-Commerce"
+    "suffix": "e-Commerce",
+    "version": "3.0.0"
   }
 }

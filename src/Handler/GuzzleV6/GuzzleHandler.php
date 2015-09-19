@@ -35,7 +35,7 @@ class GuzzleHandler
      */
     public function __invoke(Psr7Request $request, array $options = [])
     {
-        $request = $request->withHandler(
+        $request = $request->withHeader(
             'User-Agent',
             $request->getHeaderLine('User-Agent')
                 . ' ' . \GuzzleHttp\default_user_agent()
@@ -44,9 +44,9 @@ class GuzzleHandler
         return $this->client->sendAsync($request, $options)->otherwise(
             static function (\Exception $e) {
                 $error = [
-                    'exeption'          => $e,
+                    'exception'          => $e,
                     'connection_error'  => $e instanceof ConnectException,
-                    'responce'          => null
+                    'response'          => null
                 ];
 
                 if ($e instanceof RequestException && $e->getResponse()) {
