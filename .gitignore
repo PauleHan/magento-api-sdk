@@ -17,6 +17,8 @@
 /composer.phar
 # .idea/dataSources.xml
 # .idea/sqlDataSources.xml
+/composer.lock
+/vendor
 # .idea/dynamic.xml
 # .idea/uiDesigner.xml
 

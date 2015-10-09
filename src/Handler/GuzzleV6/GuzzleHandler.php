@@ -15,7 +15,7 @@ use Psr\Http\Message\RequestInterface as Psr7Request;
  */
 class GuzzleHandler
 {
-    /** @var \GuzzleHttp\Client  */
+    /** @var \GuzzleHttp\Client */
     private $client;
 
 
@@ -35,26 +35,27 @@ class GuzzleHandler
      */
     public function __invoke(Psr7Request $request, array $options = [])
     {
-        $request = $request->withHandler(
+        $request = $request->withHeader(
             'User-Agent',
             $request->getHeaderLine('User-Agent')
-                . ' ' . \GuzzleHttp\default_user_agent()
+            . ' ' . \GuzzleHttp\default_user_agent()
         );
 
         return $this->client->sendAsync($request, $options)->otherwise(
-            static function (\Exception $e) {
-                $error = [
-                    'exeption'          => $e,
-                    'connection_error'  => $e instanceof ConnectException,
-                    'responce'          => null
-                ];
+            static function (\Exception $e)
+    {
+        $error = [
+            'exception'        => $e,
+            'connection_error' => $e instanceof ConnectException,
+            'response'         => null
+        ];
 
-                if ($e instanceof RequestException && $e->getResponse()) {
-                    $error['response'] = $e->getResponse();
-                }
+        if ($e instanceof RequestException && $e->getResponse()) {
+            $error['response'] = $e->getResponse();
+        }
 
-                return new Promise\RejectedPromise($error);
-            }
+        return new Promise\RejectedPromise($error);
+    }
         );
     }
 

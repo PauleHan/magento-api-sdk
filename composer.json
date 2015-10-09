@@ -2,7 +2,10 @@
   "name": "triggmine/triggmine-sdk-php",
   "homepage": "http://triggmine.com",
   "description": "TriggMine SDK for PHP - Use TriggMine Services in your PHP project",
-  "keywords": ["triggmine","sdk"],
+  "keywords": [
+    "triggmine",
+    "sdk"
+  ],
   "type": "library",
   "license": "Apache-2.0",
   "version": "0.1-dev",
@@ -10,6 +13,12 @@
     {
       "name": "TriggMine",
       "homepage": "http://triggmine.com"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/Bladejakal/triggmine-api-bluprint"
     }
   ],
   "require": {
@@ -35,7 +44,9 @@
     "psr-4": {
       "Triggmine\\": "src/"
     },
-    "files": ["src/functions.php"]
+    "files": [
+      "src/functions.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {

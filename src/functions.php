@@ -32,6 +32,7 @@ function default_http_handler()
  *
  * @param string $service Case-insensitive namespace or endpoint prefix of the
  *                        service for which you are retrieving manifest data.
+ *
  * @return RequestInterface
  * @throws \InvalidArgumentException if the service is not supported
  */
@@ -42,7 +43,7 @@ function manifest($service = null)
     static $aliases = [];
 
     if (empty($manifest)) {
-        $manifest = load_compiled_json(__DIR__ . 'data/manifest.json');
+        $manifest = load_compiled_json(__DIR__ . '/data/manifest.json');
         foreach ($manifest as $endpoint => $info) {
             $alias = strtolower($info['namespace']);
             if ($alias != $endpoint) {
@@ -93,5 +94,29 @@ function load_compiled_json($path)
         );
     }
 
-    return json_decode(file_get_contents($path, true));
+    return json_decode(file_get_contents($path), true);
+}
+
+/**
+ * Debug function used to describe the provided value type and class.
+ *
+ * @param mixed $input
+ *
+ * @return string Returns a string containing the type of the variable and
+ *                if a class is provided, the class name.
+ */
+function describe_type($input)
+{
+    switch (gettype($input)) {
+        case 'object':
+            return 'object(' . get_class($input) . ')';
+        case 'array':
+            return 'array(' . count($input) . ')';
+        default:
+            ob_start();
+            var_dump($input);
+
+            // normalize float vs double
+            return str_replace('double(', 'float(', rtrim(ob_get_clean()));
+    }
 }

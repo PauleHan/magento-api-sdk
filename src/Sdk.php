@@ -4,6 +4,7 @@ namespace Triggmine;
 /**
  * Class Sdk
  * Build TriggMIne client based on configuration settings
+ *
  * @package Triggmine
  */
 
@@ -17,7 +18,7 @@ class Sdk
     /**
      * Builds Triggmine clients based on configuration settings.
      *
-    */
+     */
     public function __construct(array $args = [])
     {
         $this->args = $args;
@@ -41,8 +42,9 @@ class Sdk
 
     /**
      * Get a client by name using an array of constructor options.
+     *
      * @param string $name Service name or namespace
-     * @param array $args Arguments to configre the client
+     * @param array  $args Arguments to configre the client
      *
      * @return TriggmineClientInterface
      * @throw \InvalidArgumentException if any required option are missing or
@@ -66,6 +68,7 @@ class Sdk
 
         // Initialize the client class
         $client = "Triggmine\\{$namespace}\\{$namespace}Client";
+
         return new $client($args + $this->args);
     }
 
