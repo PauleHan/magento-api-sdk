@@ -2,7 +2,7 @@
 namespace Triggmine\Api\Parser;
 
 
-use Aws\CommandInterface;
+use Triggmine\CommandInterface;
 use Triggmine\Exception\TriggmineException;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Psr7;
@@ -27,7 +27,7 @@ class Crc32ValidatingParser extends AbstractParser
         CommandInterface $command,
         ResponseInterface $response
     ) {
-        if ($expected = $response->getHeaderLine('x-amz-crc32')) {
+        if ($expected = $response->getHeaderLine('x-tm-crc32')) {
             $hash = hexdec(Psr7\hash($response->getBody(), 'crc32b'));
             if ($expected != $hash) {
                 throw new TriggmineException(

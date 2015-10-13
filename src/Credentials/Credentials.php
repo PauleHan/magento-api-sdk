@@ -2,8 +2,9 @@
 namespace Triggmine\Credentials;
 
 /**
- * Basic implementation of the AWS Credentials interface that allows callers to
- * pass in the AWS Access Key and AWS Secret Access Key in the constructor.
+ * Basic implementation of the Triggmine Credentials interface that allows callers to
+ * pass in the Triggmine Access Key and Triggmine Secret Access Key in the
+ * constructor.
  */
 class Credentials implements CredentialsInterface, \Serializable
 {
@@ -12,11 +13,12 @@ class Credentials implements CredentialsInterface, \Serializable
     private $expires;
 
     /**
-     * Constructs a new BasicAWSCredentials object, with the specified AWS
-     * access key and AWS secret key
+     * Constructs a new BasicTriggmineCredentials object, with the specified
+     * Triggmine
+     * access key and Triggmine secret key
      *
-     * @param string $key     AWS access key ID
-     * @param string $secret  AWS secret access key
+     * @param string $key     Triggmine access key ID
+     * @param string $secret  Triggmine secret access key
      * @param int    $expires UNIX timestamp for when credentials expire
      */
     public function __construct($key, $secret, $expires = null)
@@ -45,10 +47,10 @@ class Credentials implements CredentialsInterface, \Serializable
         return $this->secret;
     }
 
-    public function getSecurityToken()
-    {
-        return $this->token;
-    }
+//    public function getSecurityToken()
+//    {
+//        return $this->token;
+//    }
 
     public function getExpiration()
     {

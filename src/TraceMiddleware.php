@@ -17,20 +17,20 @@ class TraceMiddleware
     private $config;
 
     private static $authHeaders = [
-        'X-Amz-Security-Token' => '[TOKEN]',
+//        'X-Tm-Security-Token' => '[TOKEN]',
     ];
 
     private static $authStrings = [
         // S3Signature
         '/TriggmineAccessKeyId=[A-Z0-9]{20}&/i' => 'TriggmineAccessKeyId=[KEY]&',
-        // SignatureV4 Signature and S3Signature
+        // SignatureV3 Signature and S3Signature
         '/Signature=.+/i' => 'Signature=[SIGNATURE]',
-        // SignatureV4 access key ID
+        // SignatureV3 access key ID
         '/Credential=[A-Z0-9]{20}\//i' => 'Credential=[KEY]/',
         // S3 signatures
         '/Triggmine [A-Z0-9]{20}:.+/' => 'Triggmine AKI[KEY]:[SIGNATURE]',
-        // STS Presigned URLs
-        '/X-Amz-Security-Token=[^&]+/i' => 'X-Amz-Security-Token=[TOKEN]',
+//         STS Presigned URLs
+//        '/X-Tm-Security-Token=[^&]+/i' => 'X-Triggmine-Security-Token=[TOKEN]',
     ];
 
     /**

@@ -1,6 +1,12 @@
 <?php
 namespace Triggmine;
 
+use Triggmine\Api\ApiProvider;
+use Triggmine\Api\DocModel;
+use Triggmine\Api\Service;
+use Triggmine\Signature\SignatureProvider;
+use GuzzleHttp\Psr7\Uri;
+
 class TriggmineClient implements TriggmineClientInterface
 {
 
@@ -16,20 +22,17 @@ class TriggmineClient implements TriggmineClientInterface
         $this->handlerList = new HandlerList();
         $resolver = new ClientResolver(static::getArguments());
         $config = $resolver->resolve($args, $this->handlerList);
-//        var_dump($config);
 
-
-        //$this->api = $config['api'];
-        //$this->signatureProvider = $config['signature_provider'];
-        //$this->endpoint = new Uri($config['endpoint']);
-        //$this->credentialProvider = $config['credentials'];
-        //$this->region = isset($config['region']) ? $config['region'] : null;
-        //$this->config = $config['config'];
-        //$this->defaultRequestOptions = $config['http'];
-        //$this->addSignatureMiddleware();
-        //if (isset($args['with_resolved'])) {
-        //    $args['with_resolved']($config);
-        //}
+        $this->api = $config['api'];
+        $this->signatureProvider = $config['signature_provider'];
+        $this->endpoint = new Uri($config['endpoint']);
+        $this->credentialProvider = $config['credentials'];
+        $this->config = $config['config'];
+        $this->defaultRequestOptions = $config['http'];
+        $this->addSignatureMiddleware();
+        if (isset($args['with_resolved'])) {
+            $args['with_resolved']($config);
+        }
     }
 
     /**
@@ -94,6 +97,11 @@ class TriggmineClient implements TriggmineClientInterface
         return $this->executeAsync($command)->wait();
     }
 
+    public function getHandlerList()
+    {
+        return $this->handlerList;
+    }
+
     /**
      * Get an array of client constructor arguments used by the client.
      *
@@ -104,4 +112,20 @@ class TriggmineClient implements TriggmineClientInterface
         return ClientResolver::getDefaultArguments();
     }
 
+    private function addSignatureMiddleware()
+    {
+        // Sign requests. This may need to be modified later to support
+        // variable signatures per/operation.
+        $this->handlerList->appendSign(
+            Middleware::signer(
+                $this->credentialProvider,
+                constantly(SignatureProvider::resolve(
+                    $this->signatureProvider,
+                    $this->config['signature_version'],
+                    $this->api->getSigningName()
+                ))
+            ),
+            'signer'
+        );
+    }
 }

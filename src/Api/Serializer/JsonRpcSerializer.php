@@ -1,8 +1,8 @@
 <?php
 namespace Triggmine\Api\Serializer;
 
-use Aws\Api\Service;
-use Aws\CommandInterface;
+use Triggmine\Api\Service;
+use Triggmine\CommandInterface;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\RequestInterface;
 
@@ -42,7 +42,7 @@ class JsonRpcSerializer
     }
 
     /**
-     * When invoked with an AWS command, returns a serialization array
+     * When invoked with an Triggmine command, returns a serialization array
      * containing "method", "uri", "headers", and "body" key value pairs.
      *
      * @param CommandInterface $command
@@ -58,7 +58,7 @@ class JsonRpcSerializer
             $operation['http']['method'],
             $this->endpoint,
             [
-                'X-Amz-Target' => $this->api->getMetadata('targetPrefix') . '.'
+                'X-Tm-Target' => $this->api->getMetadata('targetPrefix') . '.'
                     . $name,
                 'Content-Type' => $this->contentType
             ],

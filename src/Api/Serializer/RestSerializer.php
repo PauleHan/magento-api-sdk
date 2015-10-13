@@ -153,6 +153,7 @@ abstract class RestSerializer
         array $opts
     ) {
         $varspecs = [];
+
         // Create an associative array of varspecs used in expansions
         foreach ($operation->getInput()->getMembers() as $name => $member) {
             if ($member['location'] == 'uri') {
@@ -162,6 +163,7 @@ abstract class RestSerializer
                     : null;
             }
         }
+
         $relative = preg_replace_callback(
             '/\{([^\}]+)\}/',
             function (array $matches) use ($varspecs) {
@@ -177,11 +179,13 @@ abstract class RestSerializer
             },
             $operation['http']['requestUri']
         );
+
         // Add the query string variables or appending to one if needed.
         if (!empty($opts['query'])) {
             $append = Psr7\build_query($opts['query']);
             $relative .= strpos($relative, '?') ? "&{$append}" : "?$append";
         }
+
         // Expand path place holders using Amazon's slightly different URI
         // template syntax.
         return Psr7\Uri::resolve($this->endpoint, $relative);

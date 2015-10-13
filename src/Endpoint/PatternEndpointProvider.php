@@ -21,16 +21,14 @@ class PatternEndpointProvider
     public function __invoke(array $args = [])
     {
         $service = isset($args['service']) ? $args['service'] : '';
-        $region = isset($args['region']) ? $args['region'] : '';
-        $keys = ["{$region}/{$service}", "{$region}/*", "*/{$service}", "*/*"];
+        $keys = ["{$service}", "*/{$service}", "*/*"];
 
         foreach ($keys as $key) {
             if (isset($this->patterns[$key])) {
                 return $this->expand(
                     $this->patterns[$key],
                     isset($args['scheme']) ? $args['scheme'] : 'https',
-                    $service,
-                    $region
+                    $service
                 );
             }
         }
@@ -38,12 +36,11 @@ class PatternEndpointProvider
         return null;
     }
 
-    private function expand(array $config, $scheme, $service, $region)
+    private function expand(array $config, $scheme, $service)
     {
         $config['endpoint'] = $scheme . '://'
             . strtr($config['endpoint'], [
                 '{service}' => $service,
-                '{region}'  => $region
             ]);
 
         return $config;

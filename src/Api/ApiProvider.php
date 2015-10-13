@@ -75,6 +75,7 @@ class ApiProvider
     ) {
         // Execute the provider and return the result, if there is one.
         $result = $provider($type, $service, $version);
+
         if (is_array($result)) {
             return $result;
         }

@@ -52,8 +52,8 @@ class ClientResolver
             'scheme'             => [
                 'type'    => 'value',
                 'valid'   => ['string'],
-                'default' => 'https',
-                'doc'     => 'URI scheme to use when connecting connect. The SDK will utilize "https" endpoints (i.e., utilize SSL/TLS connections) by default. You can attempt to connect to a service over an unencrypted "http" endpoint by setting ``scheme`` to "http".',
+                'default' => 'http',
+                'doc'     => 'URI scheme to use when connecting connect. The SDK will utilize "http" endpoints (i.e., utilize SSL/TLS connections) by default. You can attempt to connect to a service over an unencrypted "http" endpoint by setting ``scheme`` to "http".',
             ],
             'endpoint'           => [
                 'type'  => 'value',
@@ -64,14 +64,14 @@ class ClientResolver
             'signature_provider' => [
                 'type'    => 'value',
                 'valid'   => ['callable'],
-                'doc'     => 'A callable that accepts a signature version name (e.g., "v4"), a service name, and region, and  returns a SignatureInterface object or null. This provider is used to create signers utilized by the client. See Triggmine\\Signature\\SignatureProvider for a list of built-in providers',
+                'doc'     => 'A callable that accepts a signature version name (e.g., "v3"), a service name and  returns a SignatureInterface object or null. This provider is used to create signers utilized by the client. See Triggmine\\Signature\\SignatureProvider for a list of built-in providers',
                 'default' => [__CLASS__, '_default_signature_provider'],
             ],
             'endpoint_provider'  => [
                 'type'    => 'value',
                 'valid'   => ['callable'],
                 'fn'      => [__CLASS__, '_apply_endpoint_provider'],
-                'doc'     => 'An optional PHP callable that accepts a hash of options including a "service" and "region" key and returns NULL or a hash of endpoint data, of which the "endpoint" key is required. See Triggmine\\Endpoint\\EndpointProvider for a list of built-in providers.',
+                'doc'     => 'An optional PHP callable that accepts a hash of options including a "service" and returns NULL or a hash of endpoint data, of which the "endpoint" key is required. See Triggmine\\Endpoint\\EndpointProvider for a list of built-in providers.',
                 'default' => [__CLASS__, '_default_endpoint_provider'],
             ],
             'api_provider'       => [
@@ -84,7 +84,7 @@ class ClientResolver
             'signature_version'  => [
                 'type'    => 'config',
                 'valid'   => ['string'],
-                'doc'     => 'A string representing a custom signature version to use with a service (e.g., v4). Note that per/operation signature version MAY override this requested signature version.',
+                'doc'     => 'A string representing a custom signature version to use with a service (e.g., v3). Note that per/operation signature version MAY override this requested signature version.',
                 'default' => [__CLASS__, '_default_signature_version'],
             ],
             'profile'            => [
@@ -354,7 +354,6 @@ class ClientResolver
                 new Credentials(
                     $value['key'],
                     $value['secret'],
-                    isset($value['token']) ? $value['token'] : null,
                     isset($value['expires']) ? $value['expires'] : null
                 )
             );
@@ -368,7 +367,7 @@ class ClientResolver
         } else {
             throw new IAE('Credentials must be an instance of '
                 . 'Triggmine\Credentials\CredentialsInterface, an associative '
-                . 'array that contains "key", "secret", and an optional "token" '
+                . 'array that contains "key", "secret" '
                 . 'key-value pairs, a credentials provider function, or false.');
         }
     }
@@ -551,13 +550,4 @@ the SDK.
 EOT;
     }
 
-    public static function _missing_region(array $args)
-    {
-        $service = isset($args['service']) ? $args['service'] : '';
-
-        return <<<EOT
-A "region" configuration value is required for the "{$service}" service
-(e.g., "us-west-2"). A list of available public regions and endpoints can be
-EOT;
-    }
 }

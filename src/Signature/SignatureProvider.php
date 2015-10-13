@@ -6,8 +6,8 @@ use Triggmine\Exception\UnresolvedSignatureException;
 /**
  * Signature providers.
  *
- * A signature provider is a function that accepts a version, service, and
- * region and returns a {@see SignatureInterface} object on success or NULL if
+ * A signature provider is a function that accepts a version, service and
+ * returns a {@see SignatureInterface} object on success or NULL if
  * no signature can be created from the provided arguments.
  *
  * You can wrap your calls to a signature provider with the
@@ -19,7 +19,7 @@ use Triggmine\Exception\UnresolvedSignatureException;
  *     use Triggmine\Signature\SignatureProvider;
  *     $provider = SignatureProvider::defaultProvider();
  *     // Returns a SignatureInterface or NULL.
- *     $signer = $provider('v4', 's3', 'us-west-2');
+ *     $signer = $provider('v3', 's3', 'us-west-2');
  *     // Returns a SignatureInterface or throws.
  *     $signer = SignatureProvider::resolve($provider, 'no', 's3', 'foo');
  *
@@ -29,13 +29,13 @@ use Triggmine\Exception\UnresolvedSignatureException;
  * is returned.
  *
  *     $a = SignatureProvider::defaultProvider();
- *     $b = function ($version, $service, $region) {
+ *     $b = function ($version, $service) {
  *         if ($version === 'foo') {
  *             return new MyFooSignature();
  *         }
  *     };
  *     $c = \Triggmine\or_chain($a, $b);
- *     $signer = $c('v4', 'abc', '123');     // $a handles this.
+ *     $signer = $c('v3', 'abc', '123');     // $a handles this.
  *     $signer = $c('foo', 'abc', '123');    // $b handles this.
  *     $nullValue = $c('???', 'abc', '123'); // Neither can handle this.
  */
@@ -47,7 +47,6 @@ class SignatureProvider
      * @param callable $provider Provider function to invoke.
      * @param string   $version  Signature version.
      * @param string   $service  Service name.
-     * @param string   $region   Region name.
      *
      * @return SignatureInterface
      * @throws UnresolvedSignatureException
@@ -55,17 +54,16 @@ class SignatureProvider
     public static function resolve(
         callable $provider,
         $version,
-        $service,
-        $region
+        $service
     ) {
-        $result = $provider($version, $service, $region);
+        $result = $provider($version, $service);
         if ($result instanceof SignatureInterface) {
             return $result;
         }
 
         throw new UnresolvedSignatureException(
-            "Unable to resolve a signature for $version/$service/$region.\n"
-            . "Valid signature versions include v4 and anonymous."
+            "Unable to resolve a signature for $version/$service.\n"
+            . "Valid signature versions include v3 and anonymous."
         );
     }
 
@@ -82,7 +80,7 @@ class SignatureProvider
     /**
      * Creates a signature provider that caches previously created signature
      * objects. The computed cache key is the concatenation of the version,
-     * service, and region.
+     * service.
      *
      * @param callable $provider Signature provider to wrap.
      *
@@ -92,10 +90,10 @@ class SignatureProvider
     {
         $cache = [];
 
-        return function ($version, $service, $region) use (&$cache, $provider) {
-            $key = "($version)($service)($region)";
+        return function ($version, $service) use (&$cache, $provider) {
+            $key = "($version)($service)";
             if (!isset($cache[$key])) {
-                $cache[$key] = $provider($version, $service, $region);
+                $cache[$key] = $provider($version, $service);
             }
 
             return $cache[$key];
@@ -107,19 +105,19 @@ class SignatureProvider
      *
      * This provider currently recognizes the following signature versions:
      *
-     * - v4: Signature version 4.
+     * - v3: Signature version 4.
      * - anonymous: Does not sign requests.
      *
      * @return callable
      */
     public static function version()
     {
-        return function ($version, $service, $region) {
+        return function ($version, $service) {
             switch ($version) {
-                case 'v4':
-                    return $service === 's3'
-                        ? new S3SignatureV4($service, $region)
-                        : new SignatureV4($service, $region);
+                case 'v3':
+                    return $service === 'ecommerce'
+                        ? new ECommerceSignatureV3($service)
+                        : new SignatureV3($service);
                 case 'anonymous':
                     return new AnonymousSignature();
                 default:

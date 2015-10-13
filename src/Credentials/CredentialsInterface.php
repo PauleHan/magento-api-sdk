@@ -27,7 +27,7 @@ interface CredentialsInterface
      *
      * @return string|null
      */
-    public function getSecurityToken();
+//    public function getSecurityToken();
 
     /**
      * Get the UNIX timestamp in which the credentials will expire

@@ -30,7 +30,7 @@ class QuerySerializer
     }
 
     /**
-     * When invoked with an AWS command, returns a serialization array
+     * When invoked with an Triggmine command, returns a serialization array
      * containing "method", "uri", "headers", and "body" key value pairs.
      *
      * @param CommandInterface $command

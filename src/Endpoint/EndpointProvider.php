@@ -7,7 +7,7 @@ use Triggmine\Exception\UnresolvedEndpointException;
  * Endpoint providers.
  *
  * An endpoint provider is a function that accepts a hash of endpoint options,
- * including but not limited to "service" and "region" key value pairs. The
+ * including but not limited to "service" key value pairs. The
  * endpoint provider function returns a hash of endpoint data, which MUST
  * include an "endpoint" key value pair that represents the resolved endpoint
  * or NULL if an endpoint cannot be determined.
@@ -20,11 +20,10 @@ use Triggmine\Exception\UnresolvedEndpointException;
  *     use Triggmine\Endpoint\EndpointProvider;
  *     $provider = EndpointProvider::defaultProvider();
  *     // Returns an array or NULL.
- *     $endpoint = $provider(['service' => 'ec2', 'region' => 'us-west-2']);
+ *     $endpoint = $provider(['service' => 'ec2']);
  *     // Returns an endpoint array or throws.
  *     $endpoint = EndpointProvider::resolve($provider, [
- *         'service' => 'ec2',
- *         'region'  => 'us-west-2'
+ *         'service' => 'ec2'
  *     ]);
  *
  * You can compose multiple providers into a single provider using
@@ -32,17 +31,6 @@ use Triggmine\Exception\UnresolvedEndpointException;
  * returns a new function that will invoke each provider until a non-null value
  * is returned.
  *
- *     $a = function (array $args) {
- *         if ($args['region'] === 'my-test-region') {
- *             return ['endpoint' => 'http://localhost:123/api'];
- *         }
- *     };
- *     $b = EndpointProvider::defaultProvider();
- *     $c = \Triggmine\or_chain($a, $b);
- *     $config = ['service' => 'ec2', 'region' => 'my-test-region'];
- *     $res = $c($config);  // $a handles this.
- *     $config['region'] = 'us-west-2';
- *     $res = $c($config); // $b handles this.
  */
 class EndpointProvider
 {

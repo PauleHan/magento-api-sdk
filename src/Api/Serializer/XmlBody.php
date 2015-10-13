@@ -1,12 +1,12 @@
 <?php
 namespace Triggmine\Api\Serializer;
 
-use Aws\Api\MapShape;
-use Aws\Api\Service;
-use Aws\Api\Shape;
-use Aws\Api\StructureShape;
-use Aws\Api\ListShape;
-use Aws\Api\TimestampShape;
+use Triggmine\Api\MapShape;
+use Triggmine\Api\Service;
+use Triggmine\Api\Shape;
+use Triggmine\Api\StructureShape;
+use Triggmine\Api\ListShape;
+use Triggmine\Api\TimestampShape;
 use XMLWriter;
 
 /**
@@ -14,7 +14,7 @@ use XMLWriter;
  */
 class XmlBody
 {
-    /** @var \Aws\Api\Service */
+    /** @var \Triggmine\Api\Service */
     private $api;
 
     /**

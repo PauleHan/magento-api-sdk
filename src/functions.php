@@ -5,6 +5,17 @@ use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\FulfilledPromise;
 
+
+//-----------------------------------------------------------------------------
+// Functional functions
+//-----------------------------------------------------------------------------
+
+function constantly($value)
+{
+    return function() use ($value) { return $value; };
+}
+
+
 //-----------------------------------------------------------------------------
 // Misc. functions.
 //-----------------------------------------------------------------------------

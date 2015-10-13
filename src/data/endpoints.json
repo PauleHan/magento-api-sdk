@@ -1,11 +1,8 @@
 {
-  "version": 2,
+  "version": 3,
   "endpoints": {
-    "*/*": {
-      "endpoint": "{service}.{region}.amazonaws.com"
-    },
     "*/ecommerce": {
-      "endpoint": "api.triggmine.com"
+      "endpoint": "10.0.1.132:9090/v3/{service}"
     }
   }
 }

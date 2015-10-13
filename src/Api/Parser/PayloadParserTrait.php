@@ -15,6 +15,7 @@ trait PayloadParserTrait
     private function parseJson($json)
     {
         $jsonPayload = json_decode($json, true);
+
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new ParserException('Error parsing JSON: '
                 . json_last_error_msg());
