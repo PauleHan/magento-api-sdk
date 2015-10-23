@@ -22,137 +22,135 @@ class ClientResolver
     private $argDefinitions;
 
     /** @var array Map of types to a corresponding function */
-    private static $typeMap
-        = [
-            'resource' => 'is_resource',
-            'callable' => 'is_callable',
-            'int'      => 'is_int',
-            'bool'     => 'is_bool',
-            'string'   => 'is_string',
-            'object'   => 'is_object',
-            'array'    => 'is_array',
-        ];
+    private static $typeMap = [
+        'resource' => 'is_resource',
+        'callable' => 'is_callable',
+        'int'      => 'is_int',
+        'bool'     => 'is_bool',
+        'string'   => 'is_string',
+        'object'   => 'is_object',
+        'array'    => 'is_array',
+    ];
 
-    private static $defaultArgs
-        = [
-            'service'            => [
-                'type'     => 'value',
-                'valid'    => ['string'],
-                'doc'      => 'Name of the service to utilize. This value will be supplied by default when using one of the SDK clients (e.g., Triggmine\\S3\\S3Client).',
-                'required' => true,
-                'internal' => true
-            ],
-            'exception_class'    => [
-                'type'     => 'value',
-                'valid'    => ['string'],
-                'doc'      => 'Exception class to create when an error occurs.',
-                'default'  => 'Triggmine\Exception\TriggmineException',
-                'internal' => true
-            ],
-            'scheme'             => [
-                'type'    => 'value',
-                'valid'   => ['string'],
-                'default' => 'http',
-                'doc'     => 'URI scheme to use when connecting connect. The SDK will utilize "http" endpoints (i.e., utilize SSL/TLS connections) by default. You can attempt to connect to a service over an unencrypted "http" endpoint by setting ``scheme`` to "http".',
-            ],
-            'endpoint'           => [
-                'type'  => 'value',
-                'valid' => ['string'],
-                'doc'   => 'The full URI of the webservice. This is only required when connecting to a custom endpoint (e.g., a local version of S3).',
-                'fn'    => [__CLASS__, '_apply_endpoint'],
-            ],
-            'signature_provider' => [
-                'type'    => 'value',
-                'valid'   => ['callable'],
-                'doc'     => 'A callable that accepts a signature version name (e.g., "v3"), a service name and  returns a SignatureInterface object or null. This provider is used to create signers utilized by the client. See Triggmine\\Signature\\SignatureProvider for a list of built-in providers',
-                'default' => [__CLASS__, '_default_signature_provider'],
-            ],
-            'endpoint_provider'  => [
-                'type'    => 'value',
-                'valid'   => ['callable'],
-                'fn'      => [__CLASS__, '_apply_endpoint_provider'],
-                'doc'     => 'An optional PHP callable that accepts a hash of options including a "service" and returns NULL or a hash of endpoint data, of which the "endpoint" key is required. See Triggmine\\Endpoint\\EndpointProvider for a list of built-in providers.',
-                'default' => [__CLASS__, '_default_endpoint_provider'],
-            ],
-            'api_provider'       => [
-                'type'    => 'value',
-                'valid'   => ['callable'],
-                'doc'     => 'An optional PHP callable that accepts a type, service, and version argument, and returns an array of corresponding configuration data. The type value can be one of api, waiter, or paginator.',
-                'fn'      => [__CLASS__, '_apply_api_provider'],
-                'default' => [ApiProvider::class, 'defaultProvider'],
-            ],
-            'signature_version'  => [
-                'type'    => 'config',
-                'valid'   => ['string'],
-                'doc'     => 'A string representing a custom signature version to use with a service (e.g., v3). Note that per/operation signature version MAY override this requested signature version.',
-                'default' => [__CLASS__, '_default_signature_version'],
-            ],
-            'profile'            => [
-                'type'  => 'config',
-                'valid' => ['string'],
-                'doc'   => 'Allows you to specify which profile to use when credentials are created from the Triggmine credentials file in your HOME directory. This setting overrides the Triggmine_PROFILE environment variable. Note: Specifying "profile" will cause the "credentials" key to be ignored.',
-                'fn'    => [__CLASS__, '_apply_profile'],
-            ],
-            'credentials'        => [
-                'type'    => 'value',
-                'valid'   => [
-                    CredentialsInterface::class,
-                    CacheInterface::class,
-                    'array',
-                    'bool',
-                    'callable'
-                ],
-                'doc'     => 'Specifies the credentials used to sign requests. Provide an Triggmine\Credentials\CredentialsInterface object, an associative array of "key", "secret", and an optional "token" key, `false` to use null credentials, or a callable credentials provider used to create credentials or return null. See Triggmine\\Credentials\\CredentialProvider for a list of built-in credentials providers. If no credentials are provided, the SDK will attempt to load them from the environment.',
-                'fn'      => [__CLASS__, '_apply_credentials'],
-                'default' => [CredentialProvider::class, 'defaultProvider'],
-            ],
-            'retries'            => [
-                'type'    => 'value',
-                'valid'   => ['int'],
-                'doc'     => 'Configures the maximum number of allowed retries for a client (pass 0 to disable retries). ',
-                'fn'      => [__CLASS__, '_apply_retries'],
-                'default' => 3,
-            ],
-            'validate'           => [
-                'type'    => 'value',
-                'valid'   => ['bool'],
-                'default' => true,
-                'doc'     => 'Set to false to disable client-side parameter validation.',
-                'fn'      => [__CLASS__, '_apply_validate'],
-            ],
-            'debug'              => [
-                'type'  => 'value',
-                'valid' => ['bool', 'array'],
-                'doc'   => 'Set to true to display debug information when sending requests. Alternatively, you can provide an associative array with the following keys: logfn: (callable) Function that is invoked with log messages; stream_size: (int) When the size of a stream is greater than this number, the stream data will not be logged (set to "0" to not log any stream data); scrub_auth: (bool) Set to false to disable the scrubbing of auth data from the logged messages; http: (bool) Set to false to disable the "debug" feature of lower level HTTP adapters (e.g., verbose curl output).',
-                'fn'    => [__CLASS__, '_apply_debug'],
-            ],
-            'http'               => [
-                'type'    => 'value',
-                'valid'   => ['array'],
-                'default' => [],
-                'doc'     => 'Set to an array of SDK request options to apply to each request (e.g., proxy, verify, etc.).',
-            ],
-            'http_handler'       => [
-                'type'  => 'value',
-                'valid' => ['callable'],
-                'doc'   => 'An HTTP handler is a function that accepts a PSR-7 request object and returns a promise that is fulfilled with a PSR-7 response object or rejected with an array of exception data. NOTE: This option supersedes any provided "handler" option.',
-                'fn'    => [__CLASS__, '_apply_http_handler']
-            ],
-            'handler'            => [
-                'type'    => 'value',
-                'valid'   => ['callable'],
-                'doc'     => 'A handler that accepts a command object, request object and returns a promise that is fulfilled with an Triggmine\ResultInterface object or rejected with an Triggmine\Exception\TriggmineException. A handler does not accept a next handler as it is terminal and expected to fulfill a command. If no handler is provided, a default Guzzle handler will be utilized.',
-                'fn'      => [__CLASS__, '_apply_handler'],
-                'default' => [__CLASS__, '_default_handler']
-            ],
-            'ua_append'          => [
-                'type'    => 'value',
-                'valid'   => ['string', 'array'],
-                'doc'     => 'Provide a string or array of strings to send in the User-Agent header.',
-                'fn'      => [__CLASS__, '_apply_user_agent'],
-                'default' => [],
-            ],
-        ];
+    private static $defaultArgs = [
+        'service' => [
+            'type'     => 'value',
+            'valid'    => ['string'],
+            'doc'      => 'Name of the service to utilize. This value will be supplied by default when using one of the SDK clients (e.g., Triggmine\\S3\\S3Client).',
+            'required' => true,
+            'internal' => true
+        ],
+        'exception_class' => [
+            'type'     => 'value',
+            'valid'    => ['string'],
+            'doc'      => 'Exception class to create when an error occurs.',
+            'default'  => 'Triggmine\Exception\TriggmineException',
+            'internal' => true
+        ],
+        'scheme' => [
+            'type'     => 'value',
+            'valid'    => ['string'],
+            'default'  => 'https',
+            'doc'      => 'URI scheme to use when connecting connect. The SDK will utilize "https" endpoints (i.e., utilize SSL/TLS connections) by default. You can attempt to connect to a service over an unencrypted "http" endpoint by setting ``scheme`` to "http".',
+        ],
+        'endpoint' => [
+            'type'  => 'value',
+            'valid' => ['string'],
+            'doc'   => 'The full URI of the webservice. This is only required when connecting to a custom endpoint (e.g., a local version of S3).',
+            'fn'    => [__CLASS__, '_apply_endpoint'],
+        ],
+        'version' => [
+            'type'     => 'value',
+            'valid'    => ['string'],
+            'required' => [__CLASS__, '_missing_version'],
+            'doc'      => 'The version of the webservice to utilize (e.g., 2006-03-01).',
+        ],
+        'signature_provider' => [
+            'type'    => 'value',
+            'valid'   => ['callable'],
+            'doc'     => 'A callable that accepts a signature version name (e.g., "v3"), a service name and  returns a SignatureInterface object or null. This provider is used to create signers utilized by the client. See Triggmine\\Signature\\SignatureProvider for a list of built-in providers',
+            'default' => [__CLASS__, '_default_signature_provider'],
+        ],
+        'endpoint_provider' => [
+            'type'     => 'value',
+            'valid'    => ['callable'],
+            'fn'       => [__CLASS__, '_apply_endpoint_provider'],
+            'doc'      => 'An optional PHP callable that accepts a hash of options including a "service" key and returns NULL or a hash of endpoint data, of which the "endpoint" key is required. See Triggmine\\Endpoint\\EndpointProvider for a list of built-in providers.',
+            'default' => [__CLASS__, '_default_endpoint_provider'],
+        ],
+        'api_provider' => [
+            'type'     => 'value',
+            'valid'    => ['callable'],
+            'doc'      => 'An optional PHP callable that accepts a type, service, and version argument, and returns an array of corresponding configuration data. The type value can be one of api, waiter, or paginator.',
+            'fn'       => [__CLASS__, '_apply_api_provider'],
+            'default'  => [ApiProvider::class, 'defaultProvider'],
+        ],
+        'signature_version' => [
+            'type'    => 'config',
+            'valid'   => ['string'],
+            'doc'     => 'A string representing a custom signature version to use with a service (e.g., v3). Note that per/operation signature version MAY override this requested signature version.',
+            'default' => [__CLASS__, '_default_signature_version'],
+        ],
+        'profile' => [
+            'type'  => 'config',
+            'valid' => ['string'],
+            'doc'   => 'Allows you to specify which profile to use when credentials are created from the Triggmine credentials file in your HOME directory. This setting overrides the Triggmine_PROFILE environment variable. Note: Specifying "profile" will cause the "credentials" key to be ignored.',
+            'fn'    => [__CLASS__, '_apply_profile'],
+        ],
+        'credentials' => [
+            'type'    => 'value',
+            'valid'   => [CredentialsInterface::class, CacheInterface::class, 'array', 'bool', 'callable'],
+            'doc'     => 'Specifies the credentials used to sign requests. Provide an Triggmine\Credentials\CredentialsInterface object, an associative array of "key", "secret", and an optional "token" key, `false` to use null credentials, or a callable credentials provider used to create credentials or return null. See Triggmine\\Credentials\\CredentialProvider for a list of built-in credentials providers. If no credentials are provided, the SDK will attempt to load them from the environment.',
+            'fn'      => [__CLASS__, '_apply_credentials'],
+            'default' => [CredentialProvider::class, 'defaultProvider'],
+        ],
+        'retries' => [
+            'type'    => 'value',
+            'valid'   => ['int'],
+            'doc'     => 'Configures the maximum number of allowed retries for a client (pass 0 to disable retries). ',
+            'fn'      => [__CLASS__, '_apply_retries'],
+            'default' => 3,
+        ],
+        'validate' => [
+            'type'    => 'value',
+            'valid'   => ['bool'],
+            'default' => true,
+            'doc'     => 'Set to false to disable client-side parameter validation.',
+            'fn'      => [__CLASS__, '_apply_validate'],
+        ],
+        'debug' => [
+            'type'  => 'value',
+            'valid' => ['bool', 'array'],
+            'doc'   => 'Set to true to display debug information when sending requests. Alternatively, you can provide an associative array with the following keys: logfn: (callable) Function that is invoked with log messages; stream_size: (int) When the size of a stream is greater than this number, the stream data will not be logged (set to "0" to not log any stream data); scrub_auth: (bool) Set to false to disable the scrubbing of auth data from the logged messages; http: (bool) Set to false to disable the "debug" feature of lower level HTTP adapters (e.g., verbose curl output).',
+            'fn'    => [__CLASS__, '_apply_debug'],
+        ],
+        'http' => [
+            'type'    => 'value',
+            'valid'   => ['array'],
+            'default' => [],
+            'doc'     => 'Set to an array of SDK request options to apply to each request (e.g., proxy, verify, etc.).',
+        ],
+        'http_handler' => [
+            'type'    => 'value',
+            'valid'   => ['callable'],
+            'doc'     => 'An HTTP handler is a function that accepts a PSR-7 request object and returns a promise that is fulfilled with a PSR-7 response object or rejected with an array of exception data. NOTE: This option supersedes any provided "handler" option.',
+            'fn'      => [__CLASS__, '_apply_http_handler']
+        ],
+        'handler' => [
+            'type'     => 'value',
+            'valid'    => ['callable'],
+            'doc'      => 'A handler that accepts a command object, request object and returns a promise that is fulfilled with an Triggmine\ResultInterface object or rejected with an Triggmine\Exception\TriggmineException. A handler does not accept a next handler as it is terminal and expected to fulfill a command. If no handler is provided, a default Guzzle handler will be utilized.',
+            'fn'       => [__CLASS__, '_apply_handler'],
+            'default'  => [__CLASS__, '_default_handler']
+        ],
+        'ua_append' => [
+            'type'     => 'value',
+            'valid'    => ['string', 'array'],
+            'doc'      => 'Provide a string or array of strings to send in the User-Agent header.',
+            'fn'       => [__CLASS__, '_apply_user_agent'],
+            'default'  => [],
+        ],
+    ];
 
     /**
      * Gets an array of default client arguments, each argument containing a
@@ -201,8 +199,7 @@ class ClientResolver
      *
      * @return array Returns the array of provided options.
      * @throws \InvalidArgumentException
-     * @see Triggmine\TriggmineClient::__construct for a list of available
-     *      options.
+     * @see Triggmine\TriggmineClient::__construct for a list of available options.
      */
     public function resolve(array $args, HandlerList $list)
     {
@@ -257,7 +254,6 @@ class ClientResolver
      * @param array  $args        Provided arguments
      * @param bool   $useRequired Set to true to show the required fn text if
      *                            available instead of the documentation.
-     *
      * @return string
      */
     private function getArgMessage($name, $args = [], $useRequired = false)
@@ -278,8 +274,7 @@ class ClientResolver
 
         if ($useRequired && is_callable($arg['required'])) {
             $msg .= "\n\n  ";
-            $msg .= str_replace("\n", "\n  ",
-                call_user_func($arg['required'], $args));
+            $msg .= str_replace("\n", "\n  ", call_user_func($arg['required'], $args));
         } elseif (isset($arg['doc'])) {
             $msg .= wordwrap("\n\n  {$arg['doc']}", 75, "\n  ");
         }
@@ -292,7 +287,6 @@ class ClientResolver
      *
      * @param string $name     Name of the value being validated.
      * @param mixed  $provided The provided value.
-     *
      * @throws \InvalidArgumentException
      */
     private function invalidType($name, $provided)
@@ -309,7 +303,6 @@ class ClientResolver
      * Throws an exception for missing required arguments.
      *
      * @param array $args Passed in arguments.
-     *
      * @throws \InvalidArgumentException
      */
     private function throwRequired(array $args)
@@ -329,11 +322,8 @@ class ClientResolver
         throw new IAE($msg);
     }
 
-    public static function _apply_retries(
-        $value,
-        array &$args,
-        HandlerList $list
-    ) {
+    public static function _apply_retries($value, array &$args, HandlerList $list)
+    {
         if ($value) {
             $decider = RetryMiddleware::createDefaultDecider($value);
             $list->appendSign(Middleware::retry($decider), 'retry');
@@ -354,6 +344,7 @@ class ClientResolver
                 new Credentials(
                     $value['key'],
                     $value['secret'],
+                    isset($value['token']) ? $value['token'] : null,
                     isset($value['expires']) ? $value['expires'] : null
                 )
             );
@@ -367,16 +358,13 @@ class ClientResolver
         } else {
             throw new IAE('Credentials must be an instance of '
                 . 'Triggmine\Credentials\CredentialsInterface, an associative '
-                . 'array that contains "key", "secret" '
+                . 'array that contains "key", "secret", and an optional "token" '
                 . 'key-value pairs, a credentials provider function, or false.');
         }
     }
 
-    public static function _apply_api_provider(
-        callable $value,
-        array &$args,
-        HandlerList $list
-    ) {
+    public static function _apply_api_provider(callable $value, array &$args, HandlerList $list)
+    {
         $api = new Service(
             ApiProvider::resolve(
                 $value,
@@ -387,18 +375,14 @@ class ClientResolver
             $value
         );
         $args['api'] = $api;
-        $args['serializer'] = Service::createSerializer($api,
-            $args['endpoint']);
+        $args['serializer'] = Service::createSerializer($api, $args['endpoint']);
         $args['parser'] = Service::createParser($api);
         $args['error_parser'] = Service::createErrorParser($api->getProtocol());
-        $list->prependBuild(Middleware::requestBuilder($args['serializer']),
-            'builder');
+        $list->prependBuild(Middleware::requestBuilder($args['serializer']), 'builder');
     }
 
-    public static function _apply_endpoint_provider(
-        callable $value,
-        array &$args
-    ) {
+    public static function _apply_endpoint_provider(callable $value, array &$args)
+    {
         if (!isset($args['endpoint'])) {
             // Invoke the endpoint provider and throw if it does not resolve.
             $result = EndpointProvider::resolve($value, [
@@ -409,8 +393,7 @@ class ClientResolver
             $args['endpoint'] = $result['endpoint'];
 
             if (isset($result['signatureVersion'])) {
-                $args['config']['signature_version']
-                    = $result['signatureVersion'];
+                $args['config']['signature_version'] = $result['signatureVersion'];
             }
         }
     }
@@ -418,8 +401,7 @@ class ClientResolver
     public static function _apply_debug($value, array &$args, HandlerList $list)
     {
         if ($value !== false) {
-            $list->interpose(new TraceMiddleware($value === true ? []
-                : $value));
+            $list->interpose(new TraceMiddleware($value === true ? [] : $value));
         }
     }
 
@@ -428,11 +410,8 @@ class ClientResolver
         $args['credentials'] = CredentialProvider::ini($args['profile']);
     }
 
-    public static function _apply_validate(
-        $value,
-        array &$args,
-        HandlerList $list
-    ) {
+    public static function _apply_validate($value, array &$args, HandlerList $list)
+    {
         if ($value === true) {
             $list->appendValidate(
                 Middleware::validation($args['api'], new Validator()),
@@ -441,11 +420,8 @@ class ClientResolver
         }
     }
 
-    public static function _apply_handler(
-        $value,
-        array &$args,
-        HandlerList $list
-    ) {
+    public static function _apply_handler($value, array &$args, HandlerList $list)
+    {
         $list->setHandler($value);
     }
 
@@ -459,11 +435,8 @@ class ClientResolver
         );
     }
 
-    public static function _apply_http_handler(
-        $value,
-        array &$args,
-        HandlerList $list
-    ) {
+    public static function _apply_http_handler($value, array &$args, HandlerList $list)
+    {
         $args['handler'] = new WrappedHttpHandler(
             $value,
             $args['parser'],
@@ -472,11 +445,8 @@ class ClientResolver
         );
     }
 
-    public static function _apply_user_agent(
-        $value,
-        array &$args,
-        HandlerList $list
-    ) {
+    public static function _apply_user_agent($value, array &$args, HandlerList $list)
+    {
         if (!is_array($value)) {
             $value = [$value];
         }
@@ -486,8 +456,7 @@ class ClientResolver
         array_unshift($value, 'Triggmine-sdk-php/' . Sdk::VERSION);
         $args['ua_append'] = $value;
 
-        $list->appendBuild(static function (callable $handler) use ($value)
-        {
+        $list->appendBuild(static function (callable $handler) use ($value) {
             return function (
                 CommandInterface $command,
                 RequestInterface $request
@@ -503,11 +472,8 @@ class ClientResolver
         });
     }
 
-    public static function _apply_endpoint(
-        $value,
-        array &$args,
-        HandlerList $list
-    ) {
+    public static function _apply_endpoint($value, array &$args, HandlerList $list)
+    {
         $parts = parse_url($value);
         if (empty($parts['scheme']) || empty($parts['host'])) {
             throw new IAE(
@@ -544,10 +510,16 @@ class ClientResolver
         }, $versions)) ?: '* (none found)';
 
         return <<<EOT
-A list of available API versions can be found on each client's API documentation
-unable to load a specific API version, then you may need to update your copy of
-the SDK.
+A "version" configuration value is required. Specifying a version constraint
+ensures that your code will not be affected by a breaking change made to the
+service. For example, when using Triggmine Commerce, you can lock your API version to
+"2016-01-01".
+
+Your build of the SDK has the following version(s) of "{$service}": {$versions}
+
+You may provide "latest" to the "version" configuration value to utilize the
+most recent available API version that your client's API provider can find.
+Note: Using 'latest' in a production application is not recommended.
 EOT;
     }
-
 }

@@ -6,38 +6,21 @@ use Triggmine\Exception\UnresolvedSignatureException;
 /**
  * Signature providers.
  *
- * A signature provider is a function that accepts a version, service and
- * returns a {@see SignatureInterface} object on success or NULL if
+ * A signature provider is a function that accepts a version, service
+ * and returns a {@see SignatureInterface} object on success or NULL if
  * no signature can be created from the provided arguments.
  *
  * You can wrap your calls to a signature provider with the
  * {@see SignatureProvider::resolve} function to ensure that a signature object
  * is created. If a signature object is not created, then the resolve()
- * function will throw a {@see
- * Triggmine\Exception\UnresolvedSignatureException}.
+ * function will throw a {@see Triggmine\Exception\UnresolvedSignatureException}.
  *
  *     use Triggmine\Signature\SignatureProvider;
  *     $provider = SignatureProvider::defaultProvider();
  *     // Returns a SignatureInterface or NULL.
- *     $signer = $provider('v3', 's3', 'us-west-2');
+ *     $signer = $provider('v3');
  *     // Returns a SignatureInterface or throws.
  *     $signer = SignatureProvider::resolve($provider, 'no', 's3', 'foo');
- *
- * You can compose multiple providers into a single provider using
- * {@see Triggmine\or_chain}. This function accepts providers as arguments and
- * returns a new function that will invoke each provider until a non-null value
- * is returned.
- *
- *     $a = SignatureProvider::defaultProvider();
- *     $b = function ($version, $service) {
- *         if ($version === 'foo') {
- *             return new MyFooSignature();
- *         }
- *     };
- *     $c = \Triggmine\or_chain($a, $b);
- *     $signer = $c('v3', 'abc', '123');     // $a handles this.
- *     $signer = $c('foo', 'abc', '123');    // $b handles this.
- *     $nullValue = $c('???', 'abc', '123'); // Neither can handle this.
  */
 class SignatureProvider
 {
@@ -51,18 +34,15 @@ class SignatureProvider
      * @return SignatureInterface
      * @throws UnresolvedSignatureException
      */
-    public static function resolve(
-        callable $provider,
-        $version,
-        $service
-    ) {
+    public static function resolve(callable $provider, $version, $service)
+    {
         $result = $provider($version, $service);
         if ($result instanceof SignatureInterface) {
             return $result;
         }
 
         throw new UnresolvedSignatureException(
-            "Unable to resolve a signature for $version/$service.\n"
+            "Unable to resolve a signature for $version/$service\n"
             . "Valid signature versions include v3 and anonymous."
         );
     }
@@ -89,13 +69,11 @@ class SignatureProvider
     public static function memoize(callable $provider)
     {
         $cache = [];
-
         return function ($version, $service) use (&$cache, $provider) {
             $key = "($version)($service)";
             if (!isset($cache[$key])) {
                 $cache[$key] = $provider($version, $service);
             }
-
             return $cache[$key];
         };
     }
@@ -105,7 +83,7 @@ class SignatureProvider
      *
      * This provider currently recognizes the following signature versions:
      *
-     * - v3: Signature version 4.
+     * - v3: Signature version 3.
      * - anonymous: Does not sign requests.
      *
      * @return callable
@@ -115,9 +93,7 @@ class SignatureProvider
         return function ($version, $service) {
             switch ($version) {
                 case 'v3':
-                    return $service === 'ecommerce'
-                        ? new ECommerceSignatureV3($service)
-                        : new SignatureV3($service);
+                    return new SignatureV3($service);
                 case 'anonymous':
                     return new AnonymousSignature();
                 default:

@@ -14,9 +14,11 @@ class StructureShape extends Shape
     public function __construct(array $definition, ShapeMap $shapeMap)
     {
         $definition['type'] = 'structure';
+
         if (!isset($definition['members'])) {
             $definition['members'] = [];
         }
+
         parent::__construct($definition, $shapeMap);
     }
 
@@ -57,6 +59,7 @@ class StructureShape extends Shape
     public function getMember($name)
     {
         $members = $this->getMembers();
+
         if (!isset($members[$name])) {
             throw new \InvalidArgumentException('Unknown member ' . $name);
         }
@@ -64,9 +67,11 @@ class StructureShape extends Shape
         return $members[$name];
     }
 
+
     private function generateMembersHash()
     {
         $this->members = [];
+
         foreach ($this->definition['members'] as $name => $definition) {
             $this->members[$name] = $this->shapeFor($definition);
         }

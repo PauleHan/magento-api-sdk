@@ -33,8 +33,7 @@ final class Middleware
         ) {
             return function (
                 CommandInterface $command,
-                RequestInterface $request = null
-            )
+                RequestInterface $request = null)
             use (
                 $handler,
                 $api,
@@ -66,7 +65,6 @@ final class Middleware
     public static function validation(Service $api)
     {
         $validator = new Validator();
-
         return function (callable $handler) use ($api, $validator) {
             return function (
                 CommandInterface $command,
@@ -78,7 +76,6 @@ final class Middleware
                     $operation->getInput(),
                     $command->toArray()
                 );
-
                 return $handler($command, $request);
             };
         };
@@ -89,16 +86,12 @@ final class Middleware
      *
      * @param callable $serializer Function used to serialize a request for a
      *                             command.
-     *
      * @return callable
      */
     public static function requestBuilder(callable $serializer)
     {
         return function (callable $handler) use ($serializer) {
-            return function (CommandInterface $command) use (
-                $serializer,
-                $handler
-            ) {
+            return function (CommandInterface $command) use ($serializer, $handler) {
                 return $handler($command, $serializer($command));
             };
         };
@@ -107,7 +100,7 @@ final class Middleware
     /**
      * Creates a middleware that signs requests for a command.
      *
-     * @param callable $credProvider Credentials provider function that
+     * @param callable $credProvider      Credentials provider function that
      *                                    returns a promise that is resolved
      *                                    with a CredentialsInterface object.
      * @param callable $signatureFunction Function that accepts a Command
@@ -116,20 +109,14 @@ final class Middleware
      *
      * @return callable
      */
-    public static function signer(
-        callable $credProvider,
-        callable $signatureFunction
-    ) {
-        return function (callable $handler) use (
-            $signatureFunction,
-            $credProvider
-        ) {
+    public static function signer(callable $credProvider, callable $signatureFunction)
+    {
+        return function (callable $handler) use ($signatureFunction, $credProvider) {
             return function (
                 CommandInterface $command,
                 RequestInterface $request
             ) use ($handler, $signatureFunction, $credProvider) {
                 $signer = $signatureFunction($command);
-
                 return $credProvider()->then(
                     function (CredentialsInterface $creds)
                     use ($handler, $command, $signer, $request) {
@@ -163,7 +150,6 @@ final class Middleware
                 RequestInterface $request = null
             ) use ($handler, $fn) {
                 $fn($command, $request);
-
                 return $handler($command, $request);
             };
         };
@@ -184,10 +170,8 @@ final class Middleware
      *
      * @return callable
      */
-    public static function retry(
-        callable $decider = null,
-        callable $delay = null
-    ) {
+    public static function retry(callable $decider = null, callable $delay = null)
+    {
         $decider = $decider ?: RetryMiddleware::createDefaultDecider();
         $delay = $delay ?: [RetryMiddleware::class, 'exponentialDelay'];
 
@@ -219,8 +203,7 @@ final class Middleware
                 ) {
                     $request = $request->withHeader(
                         'Content-Type',
-                        Psr7\mimetype_from_filename($uri)
-                            ?: 'application/octet-stream'
+                        Psr7\mimetype_from_filename($uri) ?: 'application/octet-stream'
                     );
                 }
 
@@ -246,17 +229,14 @@ final class Middleware
                 RequestInterface $request = null
             ) use ($handler, $history) {
                 $ticket = $history->start($command, $request);
-
                 return $handler($command, $request)
                     ->then(
                         function ($result) use ($history, $ticket) {
                             $history->finish($ticket, $result);
-
                             return $result;
                         },
                         function ($reason) use ($history, $ticket) {
                             $history->finish($ticket, $reason);
-
                             return Promise\rejection_for($reason);
                         }
                     );
@@ -309,9 +289,8 @@ final class Middleware
     /**
      * Creates a middleware that applies a map function to results.
      *
-     * @param callable $f Map function that accepts an
-     *                    Triggmine\ResultInterface and returns an
-     *                    Triggmine\ResultInterface.
+     * @param callable $f Map function that accepts an Triggmine\ResultInterface and
+     *                    returns an Triggmine\ResultInterface.
      *
      * @return callable
      */

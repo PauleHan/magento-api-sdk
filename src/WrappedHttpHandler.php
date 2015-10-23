@@ -65,6 +65,7 @@ class WrappedHttpHandler
         RequestInterface $request
     ) {
         $fn = $this->httpHandler;
+
         return Promise\promise_for($fn($request, $command['@http'] ?: []))
             ->then(
                 function (ResponseInterface $res) use ($command, $request) {
@@ -97,16 +98,20 @@ class WrappedHttpHandler
         $result = $status < 300
             ? $parser($command, $response)
             : new Result();
+
         $metadata = [
             'statusCode'   => $status,
             'effectiveUri' => (string) $request->getUri(),
             'headers'      => []
-        ];
+         ];
+
         // Bring headers into the metadata array.
         foreach ($response->getHeaders() as $name => $values) {
             $metadata['headers'][strtolower($name)] = $values[0];
         }
+
         $result['@metadata'] = $metadata;
+
         return $result;
     }
 
@@ -127,7 +132,9 @@ class WrappedHttpHandler
         if (!isset($err['exception'])) {
             throw new \RuntimeException('The HTTP handler was rejected without an "exception" key value pair.');
         }
+
         $serviceError = "Triggmine HTTP error: " . $err['exception']->getMessage();
+
         if (!isset($err['response'])) {
             $parts = ['response' => null];
         } else {
@@ -137,9 +144,11 @@ class WrappedHttpHandler
             $serviceError .= " {$parts['code']} ({$parts['type']}): "
                 . "{$parts['message']} - " . $err['response']->getBody();
         }
+
         $parts['exception'] = $err['exception'];
         $parts['request'] = $request;
         $parts['connection_error'] = !empty($err['connection_error']);
+
         return new $this->exceptionClass(
             sprintf(
                 'Error executing "%s" on "%s"; %s',

@@ -7,7 +7,6 @@ use Triggmine\Api\TimestampShape;
 
 /**
  * Formats the JSON body of a JSON-REST or JSON-RPC operation.
- *
  * @internal
  */
 class JsonBody
@@ -29,7 +28,6 @@ class JsonBody
     public static function getContentType(Service $service)
     {
         return 'application/json';
-//        . number_format($service->getMetadata('jsonVersion'), 1);
     }
 
     /**
@@ -60,15 +58,15 @@ class JsonBody
                         );
                     }
                 }
-
                 return $data;
+
             case 'list':
                 $items = $shape->getMember();
                 foreach ($value as &$v) {
                     $v = $this->format($items, $v);
                 }
-
                 return $value;
+
             case 'map':
                 if (empty($value)) {
                     return new \stdClass;
@@ -77,12 +75,14 @@ class JsonBody
                 foreach ($value as &$v) {
                     $v = $this->format($values, $v);
                 }
-
                 return $value;
+
             case 'blob':
                 return base64_encode($value);
+
             case 'timestamp':
                 return TimestampShape::format($value, 'unixTimestamp');
+
             default:
                 return $value;
         }

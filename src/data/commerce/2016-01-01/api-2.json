@@ -1,35 +1,31 @@
 {
-  "version": "3.0",
-  "metadata": {
-    "apiVersion": "2016-01-01",
-    "checksumFormat": "md5",
-    "endpointPrefix": "ecommerce",
-    "serviceAbbreviation": "TriggMine Ec",
-    "serviceFullName": "TriggMine eCommerce service ",
-    "signatureVersion": "v3",
-    "timestampFormat": "rfc822",
-    "protocol": "rest-json"
+  "version":"2.0",
+  "metadata":{
+    "apiVersion":"2016-01-01",
+    "endpointPrefix":"commerce",
+    "serviceFullName":"Commerce",
+    "signatureVersion":"v3",
+    "protocol":"json"
   },
-  "operations": {
+  "operations":{
     "onAddProductInCart": {
       "name": "onAddProductInCart",
       "http": {
         "method": "POST",
-        "requestUri": "e-commerce/onAddProductInCart"
+        "requestUri": "/"
       },
-      "input": {"shape": "onAddProductInCartRequest"},
-      "output": {"shape": "onAddProductInCartResult"}
+      "input": {
+        "shape": "onAddProductInCartRequest"
+      },
+      "output": {
+        "shape": "onAddProductInCartResponse",
+        "resultWrapper": "onAddProductInCartResult"
+      }
     }
   },
-  "shapes": {
+  "shapes":{
     "onAddProductInCartRequest":{
       "type": "structure",
-      "required": [
-        "device_uid",
-        "product_id",
-        "quantity",
-        "price"
-      ],
       "members": {
         "device_uid":{"shape":"string"},
         "customer_uid":{"shape":"string"},
@@ -39,10 +35,11 @@
         "currency":{"shape":"string"}
       }
     },
-
-    "onAddProductInCartResult":{
+    "onAddProductInCartResponse":{
       "type":"structure",
       "members":{
+        "ErrorCode":{"shape":"string"},
+        "LogId":{"shape":"string"},
         "status":{"shape":"string"},
         "getData":{"shape":"string"},
         "data":{"shape":"string"}

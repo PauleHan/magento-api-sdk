@@ -13,7 +13,7 @@ class Ec2ParamBuilder extends QueryParamBuilder
     {
         return ($shape['queryName']
             ?: ucfirst($shape['locationName']))
-            ?: $default;
+                ?: $default;
     }
 
     protected function isFlat(Shape $shape)

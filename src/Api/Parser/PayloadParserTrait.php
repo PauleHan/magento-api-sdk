@@ -41,8 +41,7 @@ trait PayloadParserTrait
                 throw new \RuntimeException($error->message);
             }
         } catch (\Exception $e) {
-            throw new ParserException("Error parsing XML: {$e->getMessage()}",
-                0, $e);
+            throw new ParserException("Error parsing XML: {$e->getMessage()}", 0, $e);
         } finally {
             libxml_use_internal_errors($priorSetting);
         }

@@ -28,6 +28,7 @@ class Command implements CommandInterface
         $this->name = $name;
         $this->data = $args;
         $this->handlerList = $list ?: new HandlerList();
+
         if (!isset($this->data['@http'])) {
             $this->data['@http'] = [];
         }

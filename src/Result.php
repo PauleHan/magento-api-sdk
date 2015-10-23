@@ -33,7 +33,6 @@ class Result implements ResultInterface
     public function __toString()
     {
         $jsonData = json_encode($this->toArray(), JSON_PRETTY_PRINT);
-
         return <<<EOT
 Model Data
 ----------
@@ -41,7 +40,9 @@ Data can be retrieved from the model object using the get() method of the
 model (e.g., `\$result->get(\$key)`) or "accessing the result like an
 associative array (e.g. `\$result['key']`). You can also execute JMESPath
 expressions on the result data using the search() method.
+
 {$jsonData}
+
 EOT;
     }
 

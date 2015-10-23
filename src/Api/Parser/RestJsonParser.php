@@ -11,8 +11,10 @@ use Psr\Http\Message\ResponseInterface;
 class RestJsonParser extends AbstractRestParser
 {
     use PayloadParserTrait;
+
     /** @var JsonParser */
     private $parser;
+
     /**
      * @param Service    $api    Service description
      * @param JsonParser $parser JSON body builder
@@ -22,12 +24,14 @@ class RestJsonParser extends AbstractRestParser
         parent::__construct($api);
         $this->parser = $parser ?: new JsonParser();
     }
+
     protected function payload(
         ResponseInterface $response,
         StructureShape $member,
         array &$result
     ) {
         $jsonBody = $this->parseJson($response->getBody());
+
         if ($jsonBody) {
             $result += $this->parser->parse($member, $jsonBody);
         }

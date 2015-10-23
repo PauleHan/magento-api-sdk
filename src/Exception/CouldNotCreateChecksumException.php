@@ -1,7 +1,7 @@
 <?php
 namespace Triggmine\Exception;
 
-class CouldNotCreateChecksumException extends  \RuntimeException
+class CouldNotCreateChecksumException extends \RuntimeException
 {
     public function __construct($algorithm, \Exception $previous = null)
     {
@@ -15,6 +15,5 @@ class CouldNotCreateChecksumException extends  \RuntimeException
             . "should be careful though and remember that the CachingStream "
             . "utilizes PHP temp streams. This means that the stream will be "
             . "temporarily stored on the local disk.", 0, $previous);
-
     }
 }

@@ -32,6 +32,7 @@ class TimestampShape extends Shape
             throw new \InvalidArgumentException('Unable to handle the provided'
                 . ' timestamp type: ' . gettype($value));
         }
+
         switch ($format) {
             case 'iso8601':
                 return gmdate('Y-m-d\TH:i:s\Z', $value);

@@ -6,15 +6,13 @@ use Psr\Http\Message\RequestInterface;
 
 /**
  * Interface used to provide interchangeable strategies for signing requests
- * using the various TriggMIne signature protocols.
+ * using the various Triggmine signature protocols.
  */
 interface SignatureInterface
 {
     /**
-     * Signs the specified request with an TriggMine signing protocol by using
-     * the
-     * provided TriggMine account credentials and adding the required headers to
-     * the
+     * Signs the specified request with an Triggmine signing protocol by using the
+     * provided Triggmine account credentials and adding the required headers to the
      * request.
      *
      * @param RequestInterface     $request     Request to sign

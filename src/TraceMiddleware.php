@@ -17,20 +17,16 @@ class TraceMiddleware
     private $config;
 
     private static $authHeaders = [
-//        'X-Tm-Security-Token' => '[TOKEN]',
+        'X-tm-Security-Token' => '[TOKEN]',
     ];
 
     private static $authStrings = [
-        // S3Signature
-        '/TriggmineAccessKeyId=[A-Z0-9]{20}&/i' => 'TriggmineAccessKeyId=[KEY]&',
-        // SignatureV3 Signature and S3Signature
-        '/Signature=.+/i' => 'Signature=[SIGNATURE]',
         // SignatureV3 access key ID
         '/Credential=[A-Z0-9]{20}\//i' => 'Credential=[KEY]/',
         // S3 signatures
         '/Triggmine [A-Z0-9]{20}:.+/' => 'Triggmine AKI[KEY]:[SIGNATURE]',
-//         STS Presigned URLs
-//        '/X-Tm-Security-Token=[^&]+/i' => 'X-Triggmine-Security-Token=[TOKEN]',
+        // STS Presigned URLs
+        '/X-tm-Security-Token=[^&]+/i' => 'X-tm-Security-Token=[TOKEN]',
     ];
 
     /**
@@ -57,13 +53,13 @@ class TraceMiddleware
     public function __construct(array $config = [])
     {
         $this->config = $config + [
-                'logfn'        => function ($value) { echo $value; },
-                'stream_size'  => 524288,
-                'scrub_auth'   => true,
-                'http'         => true,
-                'auth_strings' => [],
-                'auth_headers' => [],
-            ];
+            'logfn'        => function ($value) { echo $value; },
+            'stream_size'  => 524288,
+            'scrub_auth'   => true,
+            'http'         => true,
+            'auth_strings' => [],
+            'auth_headers' => [],
+        ];
 
         $this->config['auth_strings'] += self::$authStrings;
         $this->config['auth_headers'] += self::$authHeaders;

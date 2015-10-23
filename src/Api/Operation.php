@@ -7,20 +7,21 @@ namespace Triggmine\Api;
 class Operation extends AbstractModel
 {
     private $input;
-
     private $output;
-
     private $errors;
 
     public function __construct(array $definition, ShapeMap $shapeMap)
     {
         $definition['type'] = 'structure';
+
         if (!isset($definition['http']['method'])) {
             $definition['http']['method'] = 'POST';
         }
+
         if (!isset($definition['http']['requestUri'])) {
             $definition['http']['requestUri'] = '/';
         }
+
         parent::__construct($definition, $shapeMap);
     }
 

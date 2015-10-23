@@ -1,6 +1,12 @@
 <?php
 namespace Triggmine;
 
+use Psr\Http\Message\UriInterface;
+use GuzzleHttp\Promise\PromiseInterface;
+
+/**
+ * Represents an Triggmine client.
+ */
 interface TriggmineClientInterface
 {
     /**
@@ -15,7 +21,7 @@ interface TriggmineClientInterface
      * @return ResultInterface
      * @throws \Exception
      */
-    public function __call($name, array $args);
+    public function __call($name, array $arguments);
 
     /**
      * Create a command for an operation name.
@@ -55,4 +61,102 @@ interface TriggmineClientInterface
      */
     public function executeAsync(CommandInterface $command);
 
+    /**
+     * Returns a promise that is fulfilled with an
+     * {@see \Triggmine\Credentials\CredentialsInterface} object.
+     *
+     * If you need the credentials synchronously, then call the wait() method
+     * on the returned promise.
+     *
+     * @return PromiseInterface
+     */
+    public function getCredentials();
+
+    /**
+     * Gets the default endpoint, or base URL, used by the client.
+     *
+     * @return UriInterface
+     */
+    public function getEndpoint();
+
+    /**
+     * Get the service description associated with the client.
+     *
+     * @return \Triggmine\Api\Service
+     */
+    public function getApi();
+
+    /**
+     * Get a client configuration value.
+     *
+     * @param string|null $option The option to retrieve. Pass null to retrieve
+     *                            all options.
+     * @return mixed|null
+     */
+    public function getConfig($option = null);
+
+    /**
+     * Get the handler list used to transfer commands.
+     *
+     * This list can be modified to add middleware or to change the underlying
+     * handler used to send HTTP requests.
+     *
+     * @return HandlerList
+     */
+    public function getHandlerList();
+
+    /**
+     * Get a resource iterator for the specified operation.
+     *
+     * @param string $name Name of the iterator to retrieve.
+     * @param array  $args Command arguments to use with each command.
+     *
+     * @return \Iterator
+     * @throws \UnexpectedValueException if the iterator config is invalid.
+     */
+    public function getIterator($name, array $args = []);
+
+    /**
+     * Get a result paginator for the specified operation.
+     *
+     * @param string $name   Name of the operation used for iterator
+     * @param array  $args   Command args to be used with each command
+     *
+     * @return \Triggmine\ResultPaginator
+     * @throws \UnexpectedValueException if the iterator config is invalid.
+     */
+    public function getPaginator($name, array $args = []);
+
+    /**
+     * Wait until a resource is in a particular state.
+     *
+     * @param string|callable $name Name of the waiter that defines the wait
+     *                              configuration and conditions.
+     * @param array  $args          Args to be used with each command executed
+     *                              by the waiter. Waiter configuration options
+     *                              can be provided in an associative array in
+     *                              the @waiter key.
+     * @return void
+     * @throws \UnexpectedValueException if the waiter is invalid.
+     */
+    public function waitUntil($name, array $args = []);
+
+    /**
+     * Get a waiter that waits until a resource is in a particular state.
+     *
+     * Retrieving a waiter can be useful when you wish to wait asynchronously:
+     *
+     *     $waiter = $client->getWaiter('foo', ['bar' => 'baz']);
+     *     $waiter->promise()->then(function () { echo 'Done!'; });
+     *
+     * @param string|callable $name Name of the waiter that defines the wait
+     *                              configuration and conditions.
+     * @param array  $args          Args to be used with each command executed
+     *                              by the waiter. Waiter configuration options
+     *                              can be provided in an associative array in
+     *                              the @waiter key.
+     * @return \Triggmine\Waiter
+     * @throws \UnexpectedValueException if the waiter is invalid.
+     */
+    public function getWaiter($name, array $args = []);
 }

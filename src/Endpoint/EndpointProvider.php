@@ -25,12 +25,6 @@ use Triggmine\Exception\UnresolvedEndpointException;
  *     $endpoint = EndpointProvider::resolve($provider, [
  *         'service' => 'ec2'
  *     ]);
- *
- * You can compose multiple providers into a single provider using
- * {@see Triggmine\or_chain}. This function accepts providers as arguments and
- * returns a new function that will invoke each provider until a non-null value
- * is returned.
- *
  */
 class EndpointProvider
 {
@@ -64,8 +58,7 @@ class EndpointProvider
      */
     public static function defaultProvider()
     {
-        $data = \Triggmine\load_compiled_json(__DIR__
-            . '/../data/endpoints.json');
+        $data = \Triggmine\load_compiled_json(__DIR__ . '/../data/endpoints.json');
 
         return new PatternEndpointProvider($data['endpoints']);
     }

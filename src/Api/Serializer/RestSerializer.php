@@ -1,6 +1,7 @@
 <?php
 namespace Triggmine\Api\Serializer;
 
+use Triggmine\Api\MapShape;
 use Triggmine\Api\Service;
 use Triggmine\Api\Operation;
 use Triggmine\Api\Shape;
@@ -12,7 +13,6 @@ use Psr\Http\Message\RequestInterface;
 
 /**
  * Serializes HTTP locations like header, uri, payload, etc...
- *
  * @internal
  */
 abstract class RestSerializer
@@ -24,7 +24,7 @@ abstract class RestSerializer
     private $endpoint;
 
     /**
-     * @param Service $api Service API description
+     * @param Service $api      Service API description
      * @param string  $endpoint Endpoint to connect to
      */
     public function __construct(Service $api, $endpoint)
@@ -56,9 +56,9 @@ abstract class RestSerializer
     /**
      * Modifies a hash of request options for a payload body.
      *
-     * @param StructureShape $member Member to serialize
-     * @param array          $value  Value to serialize
-     * @param array          $opts   Request options to modify.
+     * @param StructureShape   $member  Member to serialize
+     * @param array            $value   Value to serialize
+     * @param array            $opts    Request options to modify.
      */
     abstract protected function payload(
         StructureShape $member,
@@ -70,10 +70,12 @@ abstract class RestSerializer
     {
         $opts = [];
         $input = $operation->getInput();
+
         // Apply the payload trait if present
         if ($payload = $input['payload']) {
             $this->applyPayload($input, $payload, $args, $opts);
         }
+
         foreach ($args as $name => $value) {
             if ($input->hasMember($name)) {
                 $member = $input->getMember($name);
@@ -89,6 +91,7 @@ abstract class RestSerializer
                 }
             }
         }
+
         if (isset($bodyMembers)) {
             $this->payload($operation->getInput(), $bodyMembers, $opts);
         }
@@ -96,24 +99,23 @@ abstract class RestSerializer
         return $opts;
     }
 
-    private function applyPayload(
-        StructureShape $input,
-        $name,
-        array $args,
-        array &$opts
-    ) {
+    private function applyPayload(StructureShape $input, $name, array $args, array &$opts)
+    {
         if (!isset($args[$name])) {
             return;
         }
+
         $m = $input->getMember($name);
-        if ($m['streaming'] || ($m['type'] == 'string' || $m['type'] == 'blob')
+
+        if ($m['streaming'] ||
+           ($m['type'] == 'string' || $m['type'] == 'blob')
         ) {
             // Streaming bodies or payloads that are strings are
             // always just a stream of data.
             $opts['body'] = Psr7\stream_for($args[$name]);
-
             return;
         }
+
         $this->payload($m, $args[$name], $opts);
     }
 
@@ -122,45 +124,32 @@ abstract class RestSerializer
         if ($member->getType() == 'timestamp') {
             $value = TimestampShape::format($value, 'rfc822');
         }
-        $opts['headers'][$member['locationName'] ?: $name] = $value;
-    }
 
-    /**
-     * Note: This is currently only present in the Amazon S3 model.
-     */
-    private function applyHeaderMap(
-        $name,
-        Shape $member,
-        array $value,
-        array &$opts
-    ) {
-        $prefix = $member['locationName'];
-        foreach ($value as $k => $v) {
-            $opts['headers'][$prefix . $k] = $v;
-        }
+        $opts['headers'][$member['locationName'] ?: $name] = $value;
     }
 
     private function applyQuery($name, Shape $member, $value, array &$opts)
     {
-        if ($value !== null) {
+        if ($member instanceof MapShape) {
+            $opts['query'] = isset($opts['query']) && is_array($opts['query'])
+                ? $opts['query'] + $value
+                : $value;
+        } elseif ($value !== null) {
             $opts['query'][$member['locationName'] ?: $name] = $value;
         }
     }
 
-    private function buildEndpoint(
-        Operation $operation,
-        array $args,
-        array $opts
-    ) {
+    private function buildEndpoint(Operation $operation, array $args, array $opts)
+    {
         $varspecs = [];
 
         // Create an associative array of varspecs used in expansions
         foreach ($operation->getInput()->getMembers() as $name => $member) {
             if ($member['location'] == 'uri') {
-                $varspecs[$member['locationName'] ?: $name]
-                    = isset($args[$name])
-                    ? $args[$name]
-                    : null;
+                $varspecs[$member['locationName'] ?: $name] =
+                    isset($args[$name])
+                        ? $args[$name]
+                        : null;
             }
         }
 
@@ -186,8 +175,6 @@ abstract class RestSerializer
             $relative .= strpos($relative, '?') ? "&{$append}" : "?$append";
         }
 
-        // Expand path place holders using Amazon's slightly different URI
-        // template syntax.
         return Psr7\Uri::resolve($this->endpoint, $relative);
     }
 }

@@ -3,18 +3,53 @@ namespace Triggmine\Credentials;
 
 use Triggmine;
 use Triggmine\CacheInterface;
-use Triggmine\Exception\TriggmineException;
+use Triggmine\Exception\CredentialsException;
 use GuzzleHttp\Promise;
 
+/**
+ * Credential providers are functions that accept no arguments and return a
+ * promise that is fulfilled with an {@see \Triggmine\Credentials\CredentialsInterface}
+ * or rejected with an {@see \Triggmine\Exception\CredentialsException}.
+ *
+ * <code>
+ * use Triggmine\Credentials\CredentialProvider;
+ * $provider = CredentialProvider::defaultProvider();
+ * // Returns a CredentialsInterface or throws.
+ * $creds = $provider()->wait();
+ * </code>
+ *
+ * Credential providers can be composed to create credentials using conditional
+ * logic that can create different credentials in different environments. You
+ * can compose multiple providers into a single provider using
+ * {@see Triggmine\Credentials\CredentialProvider::chain}. This function accepts
+ * providers as variadic arguments and returns a new function that will invoke
+ * each provider until a successful set of credentials is returned.
+ *
+ * <code>
+ * // First try an INI file at this location.
+ * $a = CredentialProvider::ini(null, '/path/to/file.ini');
+ * // Then try an INI file at this location.
+ * $b = CredentialProvider::ini(null, '/path/to/other-file.ini');
+ * // Then try loading from envrionment variables.
+ * $c = CredentialProvider::env();
+ * // Combine the three providers together.
+ * $composed = CredentialProvider::chain($a, $b, $c);
+ * // Returns a promise that is fulfilled with credentials or throws.
+ * $promise = $composed();
+ * // Wait on the credentials to resolve.
+ * $creds = $promise->wait();
+ * </code>
+ */
 class CredentialProvider
 {
-    const ENV_KEY = 'TRIGGMINE_ACCESS_KEY';
-    const ENV_SECRET = 'TRIGGMINE_SECRET_ACCESS_KEY';
+    const ENV_KEY = 'Triggmine_ACCESS_KEY_ID';
+    const ENV_SECRET = 'Triggmine_SECRET_ACCESS_KEY';
+    const ENV_SESSION = 'Triggmine_SESSION_TOKEN';
+    const ENV_PROFILE = 'Triggmine_PROFILE';
 
     /**
      * Create a default credential provider that first checks for environment
-     * variables, then checks for the "default" profile in ~/
-     * .triggmine/credentials,
+     * variables, then checks for the "default" profile in ~/.Triggmine/credentials,
      * and finally checks for credentials using EC2 instance profile
      * credentials.
      *
@@ -23,8 +58,7 @@ class CredentialProvider
      *
      * @param array $config Optional array of instance profile credentials
      *                      provider options.
-     *
-*@return callable
+     * @return callable
      */
     public static function defaultProvider(array $config = [])
     {
@@ -37,6 +71,7 @@ class CredentialProvider
                 $config['credentials']
             );
         }
+
         return self::memoize(
             self::chain(
                 self::env(),
@@ -45,6 +80,7 @@ class CredentialProvider
             )
         );
     }
+
     /**
      * Create a credential provider function from a set of static credentials.
      *
@@ -55,10 +91,12 @@ class CredentialProvider
     public static function fromCredentials(CredentialsInterface $creds)
     {
         $promise = Promise\promise_for($creds);
+
         return function () use ($promise) {
             return $promise;
         };
     }
+
     /**
      * Creates an aggregate credentials provider that invokes the provided
      * variadic providers one after the other until a provider returns
@@ -72,6 +110,7 @@ class CredentialProvider
         if (empty($links)) {
             throw new \InvalidArgumentException('No providers in chain');
         }
+
         return function () use ($links) {
             /** @var callable $parent */
             $parent = array_shift($links);
@@ -82,6 +121,7 @@ class CredentialProvider
             return $promise;
         };
     }
+
     /**
      * Wraps a credential provider and caches previously provided credentials.
      *
@@ -96,15 +136,18 @@ class CredentialProvider
         return function () use ($provider) {
             static $result;
             static $isConstant;
+
             // Constant credentials will be returned constantly.
             if ($isConstant) {
                 return $result;
             }
+
             // Create the initial promise that will be used as the cached value
             // until it expires.
             if (null === $result) {
                 $result = $provider();
             }
+
             // Return credentials that could expire and refresh when needed.
             return $result
                 ->then(function (CredentialsInterface $creds) use ($provider, &$isConstant, &$result) {
@@ -113,6 +156,7 @@ class CredentialProvider
                         $isConstant = true;
                         return $creds;
                     }
+
                     // Refresh expired credentials.
                     if (!$creds->isExpired()) {
                         return $creds;
@@ -122,6 +166,7 @@ class CredentialProvider
                 });
         };
     }
+
     /**
      * Wraps a credential provider and saves provided credentials in an
      * instance of Triggmine\CacheInterface. Forwards calls when no credentials found
@@ -140,12 +185,14 @@ class CredentialProvider
         CacheInterface $cache,
         $cacheKey = null
     ) {
-        $cacheKey = $cacheKey ?: 'triggmine_cached_credentials';
+        $cacheKey = $cacheKey ?: 'Triggmine_cached_credentials';
+
         return function () use ($provider, $cache, $cacheKey) {
             $found = $cache->get($cacheKey);
             if ($found instanceof CredentialsInterface && !$found->isExpired()) {
                 return Promise\promise_for($found);
             }
+
             return $provider()
                 ->then(function (CredentialsInterface $creds) use (
                     $cache,
@@ -157,13 +204,15 @@ class CredentialProvider
                         null === $creds->getExpiration() ?
                             0 : $creds->getExpiration() - time()
                     );
+
                     return $creds;
                 });
         };
     }
+
     /**
      * Provider that creates credentials from environment variables
-     * TRIGGMINE_ACCESS_KEY_ID, TRIGGMINE_SECRET_ACCESS_KEY.
+     * Triggmine_ACCESS_KEY_ID, Triggmine_SECRET_ACCESS_KEY, and Triggmine_SESSION_TOKEN.
      *
      * @return callable
      */
@@ -178,10 +227,12 @@ class CredentialProvider
                     new Credentials($key, $secret, getenv(self::ENV_SESSION))
                 );
             }
+
             return self::reject('Could not find environment variable '
                 . 'credentials in ' . self::ENV_KEY . '/' . self::ENV_SECRET);
         };
     }
+
     /**
      * Credential provider that creates credentials using instance profile
      * credentials.
@@ -195,6 +246,7 @@ class CredentialProvider
     {
         return new InstanceProfileProvider($config);
     }
+
     /**
      * Credentials provider that creates credentials using an ini file stored
      * in the current user's home directory.
@@ -208,8 +260,9 @@ class CredentialProvider
      */
     public static function ini($profile = null, $filename = null)
     {
-        $filename = $filename ?: (self::getHomeDir() . '/.triggmine/credentials');
+        $filename = $filename ?: (self::getHomeDir() . '/.Triggmine/credentials');
         $profile = $profile ?: (getenv(self::ENV_PROFILE) ?: 'default');
+
         return function () use ($profile, $filename) {
             if (!is_readable($filename)) {
                 return self::reject("Cannot read credentials from $filename");
@@ -221,20 +274,30 @@ class CredentialProvider
             if (!isset($data[$profile])) {
                 return self::reject("'$profile' not found in credentials file");
             }
-            if (!isset($data[$profile]['triggmine_access_key_id'])
-                || !isset($data[$profile]['triggmine_secret_access_key'])
+            if (!isset($data[$profile]['Triggmine_access_key_id'])
+                || !isset($data[$profile]['Triggmine_secret_access_key'])
             ) {
                 return self::reject("No credentials present in INI profile "
                     . "'$profile' ($filename)");
             }
+
+            if (empty($data[$profile]['Triggmine_session_token'])) {
+                $data[$profile]['Triggmine_session_token']
+                    = isset($data[$profile]['Triggmine_security_token'])
+                        ? $data[$profile]['Triggmine_security_token']
+                        : null;
+            }
+
             return Promise\promise_for(
                 new Credentials(
-                    $data[$profile]['triggmine_access_key_id'],
-                    $data[$profile]['triggmine_secret_access_key']
+                    $data[$profile]['Triggmine_access_key_id'],
+                    $data[$profile]['Triggmine_secret_access_key'],
+                    $data[$profile]['Triggmine_session_token']
                 )
             );
         };
-   }
+    }
+
     /**
      * Gets the environment's HOME directory if available.
      *
@@ -246,11 +309,14 @@ class CredentialProvider
         if ($homeDir = getenv('HOME')) {
             return $homeDir;
         }
+
         // Get the HOMEDRIVE and HOMEPATH values for Windows hosts
         $homeDrive = getenv('HOMEDRIVE');
         $homePath = getenv('HOMEPATH');
+
         return ($homeDrive && $homePath) ? $homeDrive . $homePath : null;
     }
+
     private static function reject($msg)
     {
         return new Promise\RejectedPromise(new CredentialsException($msg));

@@ -36,13 +36,11 @@ class Service extends AbstractModel
      */
     public function __construct(array $definition, callable $provider)
     {
-        static $defaults
-        = [
+        static $defaults = [
             'operations' => [],
             'shapes'     => [],
             'metadata'   => []
-        ], $defaultMeta
-        = [
+        ], $defaultMeta = [
             'apiVersion'       => null,
             'serviceFullName'  => null,
             'endpointPrefix'   => null,
@@ -71,8 +69,7 @@ class Service extends AbstractModel
      */
     public static function createSerializer(Service $api, $endpoint)
     {
-        static $mapping
-        = [
+        static $mapping = [
             'json'      => 'Triggmine\Api\Serializer\JsonRpcSerializer',
             'query'     => 'Triggmine\Api\Serializer\QuerySerializer',
             'rest-json' => 'Triggmine\Api\Serializer\RestJsonSerializer',
@@ -102,8 +99,7 @@ class Service extends AbstractModel
      */
     public static function createErrorParser($protocol)
     {
-        static $mapping
-        = [
+        static $mapping = [
             'json'      => 'Triggmine\Api\ErrorParser\JsonRpcErrorParser',
             'query'     => 'Triggmine\Api\ErrorParser\XmlErrorParser',
             'rest-json' => 'Triggmine\Api\ErrorParser\RestJsonErrorParser',
@@ -122,14 +118,12 @@ class Service extends AbstractModel
      * Applies the listeners needed to parse client models.
      *
      * @param Service $api API to create a parser for
-     *
      * @return callable
      * @throws \UnexpectedValueException
      */
     public static function createParser(Service $api)
     {
-        static $mapping
-        = [
+        static $mapping = [
             'json'      => 'Triggmine\Api\Parser\JsonRpcParser',
             'query'     => 'Triggmine\Api\Parser\QueryParser',
             'rest-json' => 'Triggmine\Api\Parser\RestJsonParser',
@@ -321,15 +315,13 @@ class Service extends AbstractModel
      *
      * @param string $name Paginator to retrieve by name. This argument is
      *                     typically the operation name.
-     *
      * @return array
      * @throws \UnexpectedValueException if the paginator does not exist.
      * @unstable The configuration format of paginators may change in the future
      */
     public function getPaginatorConfig($name)
     {
-        static $defaults
-        = [
+        static $defaults = [
             'input_token'  => null,
             'output_token' => null,
             'limit_key'    => null,

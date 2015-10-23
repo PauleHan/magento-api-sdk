@@ -6,14 +6,14 @@ use Triggmine\Exception\CouldNotCreateChecksumException;
 use GuzzleHttp\Psr7;
 use Psr\Http\Message\RequestInterface;
 
-/*
- * Signature version 3
+/**
+ * Signature Version 3
  */
 class SignatureV3 implements SignatureInterface
 {
     const ISO8601_BASIC = 'Ymd\THis\Z';
 
-        /** @var string */
+    /** @var string */
     private $service;
 
     /** @var array Cache of previously signed values */
@@ -37,10 +37,12 @@ class SignatureV3 implements SignatureInterface
         $ldt = gmdate(self::ISO8601_BASIC);
         $sdt = substr($ldt, 0, 8);
         $parsed = $this->parseRequest($request);
-        $parsed['headers']['X-Tm-Date'] = [$ldt];
-//        if ($token = $credentials->getSecurityToken()) {
-//            $parsed['headers']['X-Triggmine-Security-Token'] = [$token];
-//        }
+        $parsed['headers']['X-tm-Date'] = [$ldt];
+
+        if ($token = $credentials->getSecurityToken()) {
+            $parsed['headers']['X-tm-Security-Token'] = [$token];
+        }
+
         $cs = $this->createScope($sdt, $this->service);
         $payload = $this->getPayload($request);
         $context = $this->createContext($parsed, $payload);
@@ -52,12 +54,14 @@ class SignatureV3 implements SignatureInterface
         );
         $signature = hash_hmac('sha256', $toSign, $signingKey);
         $parsed['headers']['Authorization'] = [
-            "TM3-HMAC-SHA256 "
+            "Triggmine4-HMAC-SHA256 "
             . "Credential={$credentials->getAccessKeyId()}/{$cs}, "
             . "SignedHeaders={$context['headers']}, Signature={$signature}"
         ];
+
         return $this->buildRequest($parsed);
     }
+
     public function presign(
         RequestInterface $request,
         CredentialsInterface $credentials,
@@ -69,11 +73,11 @@ class SignatureV3 implements SignatureInterface
         $shortDate = substr($httpDate, 0, 8);
         $scope = $this->createScope($shortDate, $this->service);
         $credential = $credentials->getAccessKeyId() . '/' . $scope;
-        $parsed['query']['X-Tm-Algorithm'] = 'TM3-HMAC-SHA256';
-        $parsed['query']['X-Tm-Credential'] = $credential;
-        $parsed['query']['X-Tm-Date'] = gmdate('Ymd\THis\Z', time());
-        $parsed['query']['X-Tm-SignedHeaders'] = 'Host';
-        $parsed['query']['X-Tm-Expires'] = $this->convertExpires($expires);
+        $parsed['query']['X-tm-Algorithm'] = 'Triggmine4-HMAC-SHA256';
+        $parsed['query']['X-tm-Credential'] = $credential;
+        $parsed['query']['X-tm-Date'] = gmdate('Ymd\THis\Z', time());
+        $parsed['query']['X-tm-SignedHeaders'] = 'Host';
+        $parsed['query']['X-tm-Expires'] = $this->convertExpires($expires);
         $context = $this->createContext($parsed, $payload);
         $stringToSign = $this->createStringToSign($httpDate, $scope, $context['creq']);
         $key = $this->getSigningKey(
@@ -81,9 +85,11 @@ class SignatureV3 implements SignatureInterface
             $this->service,
             $credentials->getSecretKey()
         );
-        $parsed['query']['X-Tm-Signature'] = hash_hmac('sha256', $stringToSign, $key);
+        $parsed['query']['X-tm-Signature'] = hash_hmac('sha256', $stringToSign, $key);
+
         return $this->buildRequest($parsed);
     }
+
     /**
      * Converts a POST request to a GET request by moving POST fields into the
      * query string.
@@ -101,24 +107,29 @@ class SignatureV3 implements SignatureInterface
             throw new \InvalidArgumentException('Expected a POST request but '
                 . 'received a ' . $request->getMethod() . ' request.');
         }
+
         $sr = $request->withMethod('GET')
             ->withBody(Psr7\stream_for(''))
             ->withoutHeader('Content-Type')
             ->withoutHeader('Content-Length');
+
         // Move POST fields to the query if they are present
         if ($request->getHeaderLine('Content-Type') === 'application/x-www-form-urlencoded') {
             $body = (string) $request->getBody();
             $sr = $sr->withUri($sr->getUri()->withQuery($body));
         }
+
         return $sr;
     }
+
     protected function getPayload(RequestInterface $request)
     {
         // Calculate the request signature payload
-        if ($request->hasHeader('X-Tm-Content-Sha256')) {
+        if ($request->hasHeader('X-tm-Content-Sha256')) {
             // Handle streaming operations (e.g. Glacier.UploadArchive)
-            return $request->getHeaderLine('X-Tm-Content-Sha256');
+            return $request->getHeaderLine('X-tm-Content-Sha256');
         }
+
         if (!$request->getBody()->isSeekable()) {
             throw new CouldNotCreateChecksumException('sha256');
         }
@@ -128,31 +139,40 @@ class SignatureV3 implements SignatureInterface
             throw new CouldNotCreateChecksumException('sha256', $e);
         }
     }
+
     protected function getPresignedPayload(RequestInterface $request)
     {
         return $this->getPayload($request);
     }
+
     protected function createCanonicalizedPath($path)
     {
         $doubleEncoded = rawurlencode(ltrim($path, '/'));
+
         return '/' . str_replace('%2F', '/', $doubleEncoded);
     }
+
     private function createStringToSign($longDate, $credentialScope, $creq)
     {
         $hash = hash('sha256', $creq);
-        return "TM3-HMAC-SHA256\n{$longDate}\n{$credentialScope}\n{$hash}";
+
+        return "Triggmine4-HMAC-SHA256\n{$longDate}\n{$credentialScope}\n{$hash}";
     }
+
     private function createPresignedRequest(
         RequestInterface $request,
         CredentialsInterface $credentials
     ) {
         $parsedRequest = $this->parseRequest($request);
+
         // Make sure to handle temporary credentials
-//        if ($token = $credentials->getSecurityToken()) {
-//            $parsedRequest['headers']['X-Tm-Security-Token'] = [$token];
-//        }
+        if ($token = $credentials->getSecurityToken()) {
+            $parsedRequest['headers']['X-tm-Security-Token'] = [$token];
+        }
+
         return $this->moveHeadersToQuery($parsedRequest);
     }
+
     /**
      * @param array  $parsedRequest
      * @param string $payload Hash of the request payload
@@ -184,10 +204,12 @@ class SignatureV3 implements SignatureInterface
             'referer'             => true,
             'user-agent'          => true
         ];
-        // Normalize the path as required by SigV4
+
+        // Normalize the path as required by SigV3
         $canon = $parsedRequest['method'] . "\n"
             . $this->createCanonicalizedPath($parsedRequest['path']) . "\n"
             . $this->getCanonicalizedQuery($parsedRequest['query']) . "\n";
+
         // Case-insensitively aggregate all of the headers.
         $aggregate = [];
         foreach ($parsedRequest['headers'] as $key => $values) {
@@ -198,6 +220,7 @@ class SignatureV3 implements SignatureInterface
                 }
             }
         }
+
         ksort($aggregate);
         $canonHeaders = [];
         foreach ($aggregate as $k => $v) {
@@ -206,33 +229,41 @@ class SignatureV3 implements SignatureInterface
             }
             $canonHeaders[] = $k . ':' . preg_replace('/\s+/', ' ', implode(',', $v));
         }
+
         $signedHeadersString = implode(';', array_keys($aggregate));
         $canon .= implode("\n", $canonHeaders) . "\n\n"
             . $signedHeadersString . "\n"
             . $payload;
+
         return ['creq' => $canon, 'headers' => $signedHeadersString];
     }
+
     private function getSigningKey($shortDate, $service, $secretKey)
     {
-        $k = $shortDate . '_' . $secretKey;
+        $k = $shortDate . '_' . $service . '_' . $secretKey;
+
         if (!isset($this->cache[$k])) {
             // Clear the cache when it reaches 50 entries
             if (++$this->cacheSize > 50) {
                 $this->cache = [];
                 $this->cacheSize = 0;
             }
-            $dateKey = hash_hmac('sha256', $shortDate, "TM3{$secretKey}", true);
+            $dateKey = hash_hmac('sha256', $shortDate, "Triggmine4{$secretKey}", true);
             $serviceKey = hash_hmac('sha256', $service, true);
-            $this->cache[$k] = hash_hmac('sha256', 'tm3_request', $serviceKey, true);
+            $this->cache[$k] = hash_hmac('sha256', 'Triggmine4_request', $serviceKey, true);
         }
+
         return $this->cache[$k];
     }
+
     private function getCanonicalizedQuery(array $query)
     {
-        unset($query['X-Tm-Signature']);
+        unset($query['X-tm-Signature']);
+
         if (!$query) {
             return '';
         }
+
         $qs = '';
         ksort($query);
         foreach ($query as $k => $v) {
@@ -245,8 +276,10 @@ class SignatureV3 implements SignatureInterface
                 }
             }
         }
+
         return substr($qs, 0, -1);
     }
+
     private function convertExpires($expires)
     {
         if ($expires instanceof \DateTime) {
@@ -254,41 +287,49 @@ class SignatureV3 implements SignatureInterface
         } elseif (!is_numeric($expires)) {
             $expires = strtotime($expires);
         }
+
         $duration = $expires - time();
+
         // Ensure that the duration of the signature is not longer than a week
         if ($duration > 604800) {
             throw new \InvalidArgumentException('The expiration date of a '
-                . 'signature version 4 presigned URL must be less than one '
+                . 'signature version 3 presigned URL must be less than one '
                 . 'week');
         }
+
         return $duration;
     }
+
     private function createScope($shortDate, $service)
     {
-        return "$shortDate/$service/tm3_request";
+        return "$shortDate/$service/Triggmine4_request";
     }
+
     private function moveHeadersToQuery(array $parsedRequest)
     {
         foreach ($parsedRequest['headers'] as $name => $header) {
             $lname = strtolower($name);
-            if (substr($lname, 0, 5) == 'x-Tm') {
+            if (substr($lname, 0, 5) == 'x-tm') {
                 $parsedRequest['query'][$name] = $header;
             }
             if ($lname !== 'host') {
                 unset($parsedRequest['headers'][$name]);
             }
         }
+
         return $parsedRequest;
     }
+
     private function parseRequest(RequestInterface $request)
     {
         // Clean up any previously set headers.
         /** @var RequestInterface $request */
         $request = $request
-            ->withoutHeader('X-Tm-Date')
+            ->withoutHeader('X-tm-Date')
             ->withoutHeader('Date')
             ->withoutHeader('Authorization');
         $uri = $request->getUri();
+
         return [
             'method'  => $request->getMethod(),
             'path'    => $uri->getPath(),
@@ -299,11 +340,13 @@ class SignatureV3 implements SignatureInterface
             'version' => $request->getProtocolVersion()
         ];
     }
+
     private function buildRequest(array $req)
     {
         if ($req['query']) {
             $req['uri'] = $req['uri']->withQuery(Psr7\build_query($req['query']));
         }
+
         return new Psr7\Request(
             $req['method'],
             $req['uri'],

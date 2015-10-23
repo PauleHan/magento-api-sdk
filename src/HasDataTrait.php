@@ -28,6 +28,7 @@ trait HasDataTrait
         if (isset($this->data[$offset])) {
             return $this->data[$offset];
         }
+
         $value = null;
         return $value;
     }

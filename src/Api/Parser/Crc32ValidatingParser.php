@@ -1,14 +1,13 @@
 <?php
 namespace Triggmine\Api\Parser;
 
-
 use Triggmine\CommandInterface;
 use Triggmine\Exception\TriggmineException;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Psr7;
 
 /**
- * @internal Decorates a parser and validates the x-amz-crc32 header.
+ * @internal Decorates a parser and validates the x-tm-crc32 header.
  */
 class Crc32ValidatingParser extends AbstractParser
 {
@@ -41,8 +40,8 @@ class Crc32ValidatingParser extends AbstractParser
                 );
             }
         }
-        $fn = $this->parser;
 
+        $fn = $this->parser;
         return $fn($command, $response);
     }
 }

@@ -6,13 +6,13 @@ use Triggmine\Api\StructureShape;
 
 /**
  * Serializes requests for the REST-JSON protocol.
- *
  * @internal
  */
 class RestJsonSerializer extends RestSerializer
 {
     /** @var JsonBody */
     private $jsonFormatter;
+
     /** @var string */
     private $contentType;
 
@@ -31,11 +31,8 @@ class RestJsonSerializer extends RestSerializer
         $this->jsonFormatter = $jsonFormatter ?: new JsonBody($api);
     }
 
-    protected function payload(
-        StructureShape $member,
-        array $value,
-        array &$opts
-    ) {
+    protected function payload(StructureShape $member, array $value, array &$opts)
+    {
         $opts['headers']['Content-Type'] = $this->contentType;
         $opts['body'] = (string) $this->jsonFormatter->build($member, $value);
     }

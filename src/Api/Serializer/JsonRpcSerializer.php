@@ -8,7 +8,6 @@ use Psr\Http\Message\RequestInterface;
 
 /**
  * Prepares a JSON-RPC request for transfer.
- *
  * @internal
  */
 class JsonRpcSerializer
@@ -58,8 +57,7 @@ class JsonRpcSerializer
             $operation['http']['method'],
             $this->endpoint,
             [
-                'X-Tm-Target' => $this->api->getMetadata('targetPrefix') . '.'
-                    . $name,
+                'X-tm-Target' => $this->api->getMetadata('targetPrefix') . '.' . $name,
                 'Content-Type' => $this->contentType
             ],
             $this->jsonFormatter->build(

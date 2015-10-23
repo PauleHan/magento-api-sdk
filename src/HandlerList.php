@@ -49,13 +49,12 @@ class HandlerList implements \Countable
     private $interposeFn;
 
     /** @var array Steps (in reverse order) */
-    private $steps
-        = [
-            self::SIGN     => [],
-            self::BUILD    => [],
-            self::VALIDATE => [],
-            self::INIT     => [],
-        ];
+    private $steps = [
+        self::SIGN     => [],
+        self::BUILD    => [],
+        self::VALIDATE => [],
+        self::INIT     => [],
+    ];
 
     /**
      * @param callable $handler HTTP handler.
@@ -87,8 +86,7 @@ class HandlerList implements \Countable
         }
 
         if ($this->handler) {
-            $str .= "{$i}) Handler: " . $this->debugCallable($this->handler)
-                . "\n";
+            $str .= "{$i}) Handler: " . $this->debugCallable($this->handler) . "\n";
         }
 
         return $str;
@@ -250,8 +248,8 @@ class HandlerList implements \Countable
      * function that accepts the next handler in the list. This function must
      * then return a function that accepts a CommandInterface and optional
      * RequestInterface and returns a promise that is fulfilled with an
-     * Triggmine\ResultInterface or rejected with an
-     * Triggmine\Exception\TriggmineException object.
+     * Triggmine\ResultInterface or rejected with an Triggmine\Exception\TriggmineException
+     * object.
      *
      * @param callable|null $fn Pass null to remove any previously set function
      */
@@ -286,9 +284,9 @@ class HandlerList implements \Countable
     public function count()
     {
         return count($this->steps[self::INIT])
-        + count($this->steps[self::VALIDATE])
-        + count($this->steps[self::BUILD])
-        + count($this->steps[self::SIGN]);
+            + count($this->steps[self::VALIDATE])
+            + count($this->steps[self::BUILD])
+            + count($this->steps[self::SIGN]);
     }
 
     /**
@@ -338,7 +336,6 @@ class HandlerList implements \Countable
             return "callable({$fn})";
         } elseif (is_array($fn)) {
             $ele = is_string($fn[0]) ? $fn[0] : get_class($fn[0]);
-
             return "callable(['{$ele}', '{$fn[1]}'])";
         } else {
             return 'callable(' . spl_object_hash($fn) . ')';
@@ -358,7 +355,6 @@ class HandlerList implements \Countable
                     $this->sorted[] = $fn[0];
                 }
             }
-
             return;
         }
 

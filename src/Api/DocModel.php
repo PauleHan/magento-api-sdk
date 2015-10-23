@@ -21,6 +21,7 @@ class DocModel
         if (!extension_loaded('tidy')) {
             throw new \RuntimeException('The "tidy" PHP extension is required.');
         }
+
         $this->docs = $docs;
     }
 
@@ -77,8 +78,7 @@ class DocModel
      *
      * @param string $shapeName  Name of the shape.
      * @param string $parentName Name of the parent/context shape.
-     * @param string $ref        Name used by the context to reference the
-     *                           shape.
+     * @param string $ref        Name used by the context to reference the shape.
      *
      * @return null|string
      */
@@ -87,6 +87,7 @@ class DocModel
         if (!isset($this->docs['shapes'][$shapeName])) {
             return '';
         }
+
         $result = '';
         $d = $this->docs['shapes'][$shapeName];
         if (isset($d['refs']["{$parentName}\$${ref}"])) {
@@ -94,6 +95,7 @@ class DocModel
         } elseif (isset($d['base'])) {
             $result = $d['base'];
         }
+
         if (isset($d['append'])) {
             $result .= $d['append'];
         }
@@ -106,17 +108,18 @@ class DocModel
         if (!$content) {
             return '';
         }
+
         $tidy = new \Tidy();
         $tidy->parseString($content, [
-            'indent'                      => true,
-            'doctype'                     => 'omit',
-            'output-html'                 => true,
-            'show-body-only'              => true,
-            'drop-empty-paras'            => true,
-            'drop-font-tags'              => true,
+            'indent' => true,
+            'doctype' => 'omit',
+            'output-html' => true,
+            'show-body-only' => true,
+            'drop-empty-paras' => true,
+            'drop-font-tags' => true,
             'drop-proprietary-attributes' => true,
-            'hide-comments'               => true,
-            'logical-emphasis'            => true
+            'hide-comments' => true,
+            'logical-emphasis' => true
         ]);
         $tidy->cleanRepair();
 

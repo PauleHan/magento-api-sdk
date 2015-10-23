@@ -21,7 +21,7 @@ class PatternEndpointProvider
     public function __invoke(array $args = [])
     {
         $service = isset($args['service']) ? $args['service'] : '';
-        $keys = ["{$service}", "*/{$service}", "*/*"];
+        $keys = ["*/{$service}", "*/*"];
 
         foreach ($keys as $key) {
             if (isset($this->patterns[$key])) {

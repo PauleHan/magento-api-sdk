@@ -2,22 +2,25 @@
 namespace Triggmine;
 
 /**
- * Class Sdk
- * Build TriggMIne client based on configuration settings
+ * Builds Triggmine clients based on configuration settings.
  *
- * @package Triggmine
+ * @method \Triggmine\Commerce\CommerceClient createCommerce(array $args = [])
  */
-
 class Sdk
 {
     const VERSION = '3.0.0';
 
-    /** @var  array Arguments for creating clients */
+    /** @var array Arguments for creating clients */
     private $args;
 
     /**
-     * Builds Triggmine clients based on configuration settings.
+     * Constructs a new SDK object with an associative array of default
+     * client settings.
      *
+     * @param array $args
+     *
+     * @throws \InvalidArgumentException
+     * @see Triggmine\Sdk::getClient for a list of available options.
      */
     public function __construct(array $args = [])
     {
@@ -43,38 +46,46 @@ class Sdk
     /**
      * Get a client by name using an array of constructor options.
      *
-     * @param string $name Service name or namespace
-     * @param array  $args Arguments to configre the client
+     * @param string $name Service name or namespace (e.g., DynamoDb, s3).
+     * @param array  $args Arguments to configure the client.
      *
      * @return TriggmineClientInterface
-     * @throw \InvalidArgumentException if any required option are missing or
-     *                                  the service is not supported.
+     * @throws \InvalidArgumentException if any required options are missing or
+     *                                   the service is not supported.
+     * @see Triggmine\TriggmineClient::__construct for a list of available options for args.
      */
     public function createClient($name, array $args = [])
     {
-        // Get information about the service from manifest file
+        // Get information about the service from the manifest file.
         $service = manifest($name);
         $namespace = $service['namespace'];
 
-        // Merge provider args with stored, service-specific args
+        // Merge provided args with stored, service-specific args.
         if (isset($this->args[$namespace])) {
             $args += $this->args[$namespace];
         }
 
-        // Provide the endpoint prefix in the args
+        // Provide the endpoint prefix in the args.
         if (!isset($args['service'])) {
             $args['service'] = $service['endpoint'];
         }
 
-        // Initialize the client class
+        // Instantiate the client class.
         $client = "Triggmine\\{$namespace}\\{$namespace}Client";
-
         return new $client($args + $this->args);
     }
 
-    public function getEndpointPrefix($name)
+    /**
+     * Determine the endpoint prefix from a client namespace.
+     *
+     * @param string $name Namespace name
+     *
+     * @return string
+     * @internal
+     * @deprecated Use the `\Triggmine\manifest()` function instead.
+     */
+    public static function getEndpointPrefix($name)
     {
         return manifest($name)['endpoint'];
     }
-
 }

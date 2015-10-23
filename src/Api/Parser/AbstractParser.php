@@ -11,7 +11,7 @@ use Psr\Http\Message\ResponseInterface;
  */
 abstract class AbstractParser
 {
-    /** @var \Triggmine\Api\Service Representation of the service API */
+    /** @var \Triggmine\Api\Service Representation of the service API*/
     protected $api;
 
     /**

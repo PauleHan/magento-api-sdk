@@ -58,6 +58,7 @@ class RetryMiddleware
             $maxRetries = null !== $command['@retries'] ?
                 $command['@retries']
                 : $maxRetries;
+
             if ($retries >= $maxRetries) {
                 return false;
             } elseif (!$error) {
@@ -102,6 +103,7 @@ class RetryMiddleware
         $handler = $this->nextHandler;
         $decider = $this->decider;
         $delay = $this->delay;
+
         $g = function ($value) use ($handler, $decider, $delay, $command, $request, &$retries, &$g) {
             if ($value instanceof \Exception) {
                 if (!$decider($retries, $command, $request, null, $value)) {
@@ -112,10 +114,12 @@ class RetryMiddleware
             ) {
                 return $value;
             }
+
             // Delay fn is called with 0, 1, ... so increment after the call.
             $command['@http']['delay'] = $delay($retries++);
             return $handler($command, $request)->then($g, $g);
         };
+
         return $handler($command, $request)->then($g, $g);
     }
 }

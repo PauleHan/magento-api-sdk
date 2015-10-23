@@ -2,8 +2,7 @@
 namespace Triggmine;
 
 /**
- * Represents an Triggmine result object that is returned from executing an
- * operation.
+ * Represents an Triggmine result object that is returned from executing an operation.
  */
 interface ResultInterface extends \ArrayAccess, \IteratorAggregate, \Countable
 {
@@ -52,4 +51,4 @@ interface ResultInterface extends \ArrayAccess, \IteratorAggregate, \Countable
      * @link http://jmespath.readthedocs.org/en/latest/ JMESPath documentation
      */
     public function search($expression);
-}
+};

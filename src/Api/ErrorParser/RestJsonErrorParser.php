@@ -19,13 +19,11 @@ class RestJsonErrorParser
             $data = array_replace($data, $json);
         }
 
-        // Correct error type from services like Amazon Glacier
         if (!empty($data['type'])) {
             $data['type'] = strtolower($data['type']);
         }
 
-        // Retrieve the error code from services like Amazon Elastic Transcoder
-        if ($code = $response->getHeaderLine('x-tm-errortype')) {
+        if ($code = $response->getHeaderLine('x-tmn-errortype')) {
             $colon = strpos($code, ':');
             $data['code'] = $colon ? substr($code, 0, $colon) : $code;
         }

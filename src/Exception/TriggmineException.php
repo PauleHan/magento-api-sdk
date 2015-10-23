@@ -22,10 +22,10 @@ class TriggmineException extends \RuntimeException
     private $connectionError;
 
     /**
-     * @param string           $message  Exception message
+     * @param string           $message Exception message
      * @param CommandInterface $command
-     * @param array            $context  Exception context
-     * @param \Exception       $previous Previous exception (if any)
+     * @param array            $context Exception context
+     * @param \Exception       $previous  Previous exception (if any)
      */
     public function __construct(
         $message,
@@ -34,10 +34,8 @@ class TriggmineException extends \RuntimeException
         \Exception $previous = null
     ) {
         $this->command = $command;
-        $this->response = isset($context['response']) ? $context['response']
-            : null;
-        $this->request = isset($context['request']) ? $context['request']
-            : null;
+        $this->response = isset($context['response']) ? $context['response'] : null;
+        $this->request = isset($context['request']) ? $context['request'] : null;
         $this->requestId = isset($context['request_id'])
             ? $context['request_id']
             : null;
@@ -53,6 +51,7 @@ class TriggmineException extends \RuntimeException
         if (!$this->getPrevious()) {
             return parent::__toString();
         }
+
         // PHP strangely shows the innermost exception first before the outer
         // exception message. It also has a default character limit for
         // exception message strings such that the "next" exception (this one)

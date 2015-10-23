@@ -8,6 +8,7 @@ class MapShape extends Shape
 {
     /** @var Shape */
     private $value;
+
     /** @var Shape */
     private $key;
 
@@ -27,6 +28,7 @@ class MapShape extends Shape
             if (!isset($this->definition['value'])) {
                 throw new \RuntimeException('No value specified');
             }
+
             $this->value = Shape::create(
                 $this->definition['value'],
                 $this->shapeMap

@@ -1,8 +1,11 @@
 {
-  "version": 3,
+  "version": 2,
   "endpoints": {
-    "*/ecommerce": {
-      "endpoint": "10.0.1.132:9090/v3/{service}"
+    "*/*": {
+      "endpoint": "api.triggmine.com/{service}"
+    },
+    "*/commerce": {
+      "endpoint": "api.triggmine.com/api/Cart"
     }
   }
 }

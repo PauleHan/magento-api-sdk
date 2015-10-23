@@ -17,8 +17,7 @@ class Shape extends AbstractModel
      */
     public static function create(array $definition, ShapeMap $shapeMap)
     {
-        static $map
-        = [
+        static $map = [
             'structure' => 'Triggmine\Api\StructureShape',
             'map'       => 'Triggmine\Api\MapShape',
             'list'      => 'Triggmine\Api\ListShape',
@@ -33,13 +32,16 @@ class Shape extends AbstractModel
             'blob'      => 'Triggmine\Api\Shape',
             'boolean'   => 'Triggmine\Api\Shape'
         ];
+
         if (isset($definition['shape'])) {
             return $shapeMap->resolve($definition);
         }
+
         if (!isset($map[$definition['type']])) {
             throw new \RuntimeException('Invalid type: '
                 . print_r($definition, true));
         }
+
         $type = $map[$definition['type']];
 
         return new $type($definition, $shapeMap);

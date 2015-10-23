@@ -7,13 +7,11 @@ use Triggmine\Exception\UnresolvedApiException;
  * API providers.
  *
  * An API provider is a function that accepts a type, service, and version and
- * returns an array of API data on success or NULL if no API data can be
- * created
+ * returns an array of API data on success or NULL if no API data can be created
  * for the provided arguments.
  *
  * You can wrap your calls to an API provider with the
- * {@see ApiProvider::resolve} method to ensure that API data is created. If
- * the
+ * {@see ApiProvider::resolve} method to ensure that API data is created. If the
  * API data is not created, then the resolve() method will throw a
  * {@see Triggmine\Exception\UnresolvedApiException}.
  *
@@ -22,16 +20,14 @@ use Triggmine\Exception\UnresolvedApiException;
  *     // Returns an array or NULL.
  *     $data = $provider('api', 's3', '2006-03-01');
  *     // Returns an array or throws.
- *     $data = ApiProvider::resolve($provider, 'api', 'elasticfood',
- *     '2020-01-01');
+ *     $data = ApiProvider::resolve($provider, 'api', 'elasticfood', '2020-01-01');
  *
  * You can compose multiple providers into a single provider using
  * {@see Triggmine\or_chain}. This method accepts providers as arguments and
  * returns a new function that will invoke each provider until a non-null value
  * is returned.
  *
- *     $a = ApiProvider::filesystem(sys_get_temp_dir() .
- *     '/Triggmine-beta-models');
+ *     $a = ApiProvider::filesystem(sys_get_temp_dir() . '/Triggmine-beta-models');
  *     $b = ApiProvider::manifest();
  *
  *     $c = \Triggmine\or_chain($a, $b);
@@ -42,13 +38,12 @@ use Triggmine\Exception\UnresolvedApiException;
 class ApiProvider
 {
     /** @var array A map of public API type names to their file suffix. */
-    private static $typeMap
-        = [
-            'api'       => 'api',
-            'paginator' => 'paginators-1',
-            'waiter'    => 'waiters-2',
-            'docs'      => 'docs-2',
-        ];
+    private static $typeMap = [
+        'api'       => 'api-2',
+        'paginator' => 'paginators-1',
+        'waiter'    => 'waiters-2',
+        'docs'      => 'docs-2',
+    ];
 
     /** @var array API manifest */
     private $manifest;
@@ -67,15 +62,10 @@ class ApiProvider
      * @return array
      * @throws UnresolvedApiException
      */
-    public static function resolve(
-        callable $provider,
-        $type,
-        $service,
-        $version
-    ) {
+    public static function resolve(callable $provider, $type, $service, $version)
+    {
         // Execute the provider and return the result, if there is one.
         $result = $provider($type, $service, $version);
-
         if (is_array($result)) {
             return $result;
         }
@@ -188,7 +178,6 @@ class ApiProvider
         } else {
             return null;
         }
-
         // Resolve the version or return null.
         if (!isset($this->manifest)) {
             $this->buildVersionsList($service);
@@ -235,8 +224,7 @@ class ApiProvider
         }
 
         // Get versions, remove . and .., and sort in descending order.
-        $results = array_diff(scandir($dir, SCANDIR_SORT_DESCENDING),
-            ['..', '.']);
+        $results = array_diff(scandir($dir, SCANDIR_SORT_DESCENDING), ['..', '.']);
 
         if (!$results) {
             $this->manifest[$service] = ['versions' => []];
@@ -246,8 +234,7 @@ class ApiProvider
                     'latest' => $results[0]
                 ]
             ];
-            $this->manifest[$service]['versions'] += array_combine($results,
-                $results);
+            $this->manifest[$service]['versions'] += array_combine($results, $results);
         }
     }
 }

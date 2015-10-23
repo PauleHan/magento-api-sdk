@@ -19,9 +19,11 @@ class QueryParamBuilder
         if (null !== $shape['queryName']) {
             return $shape['queryName'];
         }
+
         if (null !== $shape['locationName']) {
             return $shape['locationName'];
         }
+
         if ($this->isFlat($shape) && !empty($shape['member']['locationName'])) {
             return $shape['member']['locationName'];
         }
@@ -39,6 +41,7 @@ class QueryParamBuilder
         if (!$this->methods) {
             $this->methods = array_fill_keys(get_class_methods($this), true);
         }
+
         $query = [];
         $this->format_structure($shape, $params, '', $query);
 
@@ -64,6 +67,7 @@ class QueryParamBuilder
         if ($prefix) {
             $prefix .= '.';
         }
+
         foreach ($value as $k => $v) {
             if ($shape->hasMember($k)) {
                 $member = $shape->getMember($k);
@@ -86,10 +90,11 @@ class QueryParamBuilder
         // Handle empty list serialization
         if (!$value) {
             $query[$prefix] = '';
-
             return;
         }
+
         $items = $shape->getMember();
+
         if (!$this->isFlat($shape)) {
             $prefix .= '.member';
         } elseif ($name = $this->queryName($items)) {
@@ -97,6 +102,7 @@ class QueryParamBuilder
             $parts[count($parts) - 1] = $name;
             $prefix = implode('.', $parts);
         }
+
         foreach ($value as $k => $v) {
             $this->format($items, $v, $prefix . '.' . ($k + 1), $query);
         }
@@ -110,12 +116,15 @@ class QueryParamBuilder
     ) {
         $vals = $shape->getValue();
         $keys = $shape->getKey();
+
         if (!$this->isFlat($shape)) {
             $prefix .= '.entry';
         }
+
         $i = 0;
         $keyName = '%s.%d.' . $this->queryName($keys, 'key');
         $valueName = '%s.%s.' . $this->queryName($vals, 'value');
+
         foreach ($value as $k => $v) {
             $i++;
             $this->format($keys, $k, sprintf($keyName, $prefix, $i), $query);
@@ -137,12 +146,8 @@ class QueryParamBuilder
         $query[$prefix] = TimestampShape::format($value, 'iso8601');
     }
 
-    protected function format_boolean(
-        Shape $shape,
-        $value,
-        $prefix,
-        array &$query
-    ) {
+    protected function format_boolean(Shape $shape, $value, $prefix, array &$query)
+    {
         $query[$prefix] = ($value) ? 'true' : 'false';
     }
 }

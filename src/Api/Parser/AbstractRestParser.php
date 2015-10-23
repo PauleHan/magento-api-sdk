@@ -34,9 +34,11 @@ abstract class AbstractRestParser extends AbstractParser
     ) {
         $output = $this->api->getOperation($command->getName())->getOutput();
         $result = [];
+
         if ($payload = $output['payload']) {
             $this->extractPayload($payload, $output, $response, $result);
         }
+
         foreach ($output->getMembers() as $name => $member) {
             switch ($member['location']) {
                 case 'header':
@@ -50,6 +52,7 @@ abstract class AbstractRestParser extends AbstractParser
                     break;
             }
         }
+
         if (!$payload && $response->getBody()->getSize() > 0) {
             // if no payload was found, then parse the contents of the body
             $this->payload($response, $output, $result);
@@ -65,6 +68,7 @@ abstract class AbstractRestParser extends AbstractParser
         array &$result
     ) {
         $member = $output->getMember($payload);
+
         if ($member instanceof StructureShape) {
             // Structure members parse top-level data into a specific key.
             $result[$payload] = [];
@@ -85,6 +89,7 @@ abstract class AbstractRestParser extends AbstractParser
         &$result
     ) {
         $value = $response->getHeaderLine($shape['locationName'] ?: $name);
+
         switch ($shape->getType()) {
             case 'float':
             case 'double':
@@ -109,6 +114,7 @@ abstract class AbstractRestParser extends AbstractParser
                     return;
                 }
         }
+
         $result[$name] = $value;
     }
 
@@ -125,6 +131,7 @@ abstract class AbstractRestParser extends AbstractParser
         $result[$name] = [];
         $prefix = $shape['locationName'];
         $prefixLen = strlen($prefix);
+
         foreach ($response->getHeaders() as $k => $values) {
             if (!$prefixLen) {
                 $result[$name][$k] = implode(', ', $values);

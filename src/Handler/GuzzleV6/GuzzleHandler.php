@@ -11,16 +11,15 @@ use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\RequestInterface as Psr7Request;
 
 /**
- * A request handler that send PSR-7-compatible request with Guzzle 6
+ * A request handler that sends PSR-7-compatible requests with Guzzle 6.
  */
 class GuzzleHandler
 {
-    /** @var \GuzzleHttp\Client */
+    /** @var ClientInterface */
     private $client;
 
-
     /**
-     * @param \GuzzleHttp\ClientInterface|null $client
+     * @param ClientInterface $client
      */
     public function __construct(ClientInterface $client = null)
     {
@@ -28,36 +27,33 @@ class GuzzleHandler
     }
 
     /**
-     * @param \Psr\Http\Message\RequestInterface $request
-     * @param array                              $options
+     * @param Psr7Request $request
+     * @param array       $options
      *
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return Promise\Promise
      */
     public function __invoke(Psr7Request $request, array $options = [])
     {
         $request = $request->withHeader(
             'User-Agent',
             $request->getHeaderLine('User-Agent')
-            . ' ' . \GuzzleHttp\default_user_agent()
+                . ' ' . \GuzzleHttp\default_user_agent()
         );
 
         return $this->client->sendAsync($request, $options)->otherwise(
-            static function (\Exception $e)
-    {
-        $error = [
-            'exception'        => $e,
-            'connection_error' => $e instanceof ConnectException,
-            'response'         => null
-        ];
+            static function (\Exception $e) {
+                $error = [
+                    'exception'        => $e,
+                    'connection_error' => $e instanceof ConnectException,
+                    'response'         => null,
+                ];
 
-        if ($e instanceof RequestException && $e->getResponse()) {
-            $error['response'] = $e->getResponse();
-        }
+                if ($e instanceof RequestException && $e->getResponse()) {
+                    $error['response'] = $e->getResponse();
+                }
 
-        return new Promise\RejectedPromise($error);
-    }
+                return new Promise\RejectedPromise($error);
+            }
         );
     }
-
-
 }
