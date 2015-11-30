@@ -1,18 +1,22 @@
 {
   "version":"2.0",
   "metadata":{
-    "apiVersion":"2016-01-01",
+    "apiVersion":"2006-03-01",
+    "checksumFormat":"md5",
     "endpointPrefix":"commerce",
-    "serviceFullName":"Commerce",
+    "globalEndpoint":"api.trm.com",
+    "serviceAbbreviation":"TMC",
+    "serviceFullName":"TriggMine Commerce",
     "signatureVersion":"v3",
-    "protocol":"json"
+    "timestampFormat":"iso8601",
+    "protocol":"rest-json"
   },
   "operations":{
     "onAddProductInCart": {
       "name": "onAddProductInCart",
       "http": {
         "method": "POST",
-        "requestUri": "/"
+        "requestUri": "v3/e-commerce/onAddProductInCart"
       },
       "input": {
         "shape": "onAddProductInCartRequest"
@@ -28,11 +32,30 @@
       "type": "structure",
       "members": {
         "device_uid":{"shape":"string"},
+        "Method":{"shape":"string"},
+        "Token":{"shape":"string"},
         "customer_uid":{"shape":"string"},
         "product_id":{"shape":"string"},
         "quantity":{"shape":"integer"},
         "price":{"shape":"integer"},
-        "currency":{"shape":"string"}
+        "currency":{"shape":"string"},
+        "Data":{"shape":"DataRequest"}
+      }
+    },
+    "DataRequest":{
+      "type":"structure",
+      "members":{
+        "Agent":{"shape":"string"},
+        "Version":{"shape":"string"},
+        "OtherInfo":{"shape":"string"},
+        "RestoreCartUrl":{"shape":"string"},
+        "BuyerEmail":{"shape":"string"}
+      }
+    },
+    "DataResponse":{
+      "type":"structure",
+      "members":{
+        "BuyerId":{"shape":"string"}
       }
     },
     "onAddProductInCartResponse":{
@@ -42,11 +65,13 @@
         "LogId":{"shape":"string"},
         "status":{"shape":"string"},
         "getData":{"shape":"string"},
-        "data":{"shape":"string"}
+        "data":{"shape":"string"},
+        "DataResponse":{"shape":"DataResponse"}
       }
     },
     "string":{"type":"string"},
     "integer":{"type":"integer"},
-    "boolean":{"type":"boolean"}
+    "boolean":{"type":"boolean"},
+    "array":{"type":"array"}
   }
 }

@@ -5,7 +5,8 @@
       "endpoint": "api.triggmine.com/{service}"
     },
     "*/commerce": {
-      "endpoint": "api.triggmine.com/api/Cart"
+      "endpoint": "webapi-v3.azurewebsites.net/"
     }
   }
 }
+

@@ -324,13 +324,4 @@ class TriggmineClient implements TriggmineClientInterface
             new DocModel($docs)
         ];
     }
-
-    /**
-     * @deprecated
-     * @return static
-     */
-    public static function factory(array $config = [])
-    {
-        return new static($config);
-    }
 }

@@ -49,7 +49,7 @@ class CredentialProvider
 
     /**
      * Create a default credential provider that first checks for environment
-     * variables, then checks for the "default" profile in ~/.Triggmine/credentials,
+     * variables, then checks for the "default" profile in ~/.triggmine/credentials,
      * and finally checks for credentials using EC2 instance profile
      * credentials.
      *
@@ -260,7 +260,7 @@ class CredentialProvider
      */
     public static function ini($profile = null, $filename = null)
     {
-        $filename = $filename ?: (self::getHomeDir() . '/.Triggmine/credentials');
+        $filename = $filename ?: (self::getHomeDir() . '/.triggmine/credentials');
         $profile = $profile ?: (getenv(self::ENV_PROFILE) ?: 'default');
 
         return function () use ($profile, $filename) {

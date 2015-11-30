@@ -110,7 +110,7 @@ class WrappedHttpHandler
             $metadata['headers'][strtolower($name)] = $values[0];
         }
 
-        $result['@metadata'] = $metadata;
+//        $result['@metadata'] = $metadata;
 
         return $result;
     }
