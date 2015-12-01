@@ -281,7 +281,7 @@ EOT;
         $conf = $r->resolve([
             'service'      => 'commerce',
             'retry_logger' => 'debug',
-            'endpoint'     => 'http://us-east-1.foo.amazonTriggmine.com',
+            'endpoint'     => 'http://triggmine.com',
             'version'      => 'latest'
         ], new HandlerList());
     }
@@ -293,7 +293,7 @@ EOT;
         $r->resolve([
             'service'  => 'commerce',
             'debug'    => true,
-            'endpoint' => 'http://us-east-1.foo.amazonTriggmine.com',
+            'endpoint' => 'http://triggmine.com',
             'version'  => 'latest'
         ], $em);
     }
@@ -305,7 +305,7 @@ EOT;
         $r->resolve([
             'service'  => 'commerce',
             'debug'    => false,
-            'endpoint' => 'http://us-east-1.foo.amazonTriggmine.com',
+            'endpoint' => 'http://triggmine.com',
             'version'  => 'latest'
         ], $em);
     }
@@ -397,7 +397,7 @@ EOT;
     public function malformedEndpointProvider()
     {
         return [
-            ['www.amazon.com'], // missing protocol
+            ['www.triggmine.com'], // missing protocol
             ['https://'], // missing host
         ];
     }
