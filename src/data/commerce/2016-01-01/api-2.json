@@ -1,17 +1,17 @@
 {
-  "version":"2.0",
-  "metadata":{
-    "apiVersion":"2006-03-01",
-    "checksumFormat":"md5",
-    "endpointPrefix":"commerce",
-    "globalEndpoint":"api.trm.com",
-    "serviceAbbreviation":"TMC",
-    "serviceFullName":"TriggMine Commerce",
-    "signatureVersion":"v3",
-    "timestampFormat":"iso8601",
-    "protocol":"rest-json"
+  "version": "2.0",
+  "metadata": {
+    "apiVersion": "2006-03-01",
+    "checksumFormat": "md5",
+    "endpointPrefix": "commerce",
+    "globalEndpoint": "webapi-v3.azurewebsites.net",
+    "serviceAbbreviation": "TMC",
+    "serviceFullName": "TriggMine Commerce",
+    "signatureVersion": "v3",
+    "timestampFormat": "iso8601",
+    "protocol": "rest-json"
   },
-  "operations":{
+  "operations": {
     "onAddProductInCart": {
       "name": "onAddProductInCart",
       "http": {
@@ -20,58 +20,196 @@
       },
       "input": {
         "shape": "onAddProductInCartRequest"
+      }
+    },
+    "onFullCartChange": {
+      "name": "onFullCartChange",
+      "http": {
+        "method": "POST",
+        "requestUri": "api/v3/events/e-commerce/cart/onFullCartChange"
+      },
+      "input": {
+        "shape": "onFullCartChangeRequest"
       },
       "output": {
-        "shape": "onAddProductInCartResponse",
-        "resultWrapper": "onAddProductInCartResult"
+        "shape": "onAddProductInCartResponse"
+      }
+    },
+    "onConvertCartToOrder": {
+      "name": "onConvertCartToOrder",
+      "http": {
+        "method": "POST",
+        "requestUri": "api/v3/events/e-commerce/cart/onConvertCartToOrder"
+      },
+      "input": {
+        "shape": "onConvertCartToOrderRequest"
       }
     }
   },
-  "shapes":{
-    "onAddProductInCartRequest":{
+  "shapes": {
+    "onConvertCartToOrderRequest": {
       "type": "structure",
       "members": {
-        "device_uid":{"shape":"string"},
-        "Method":{"shape":"string"},
-        "Token":{"shape":"string"},
-        "customer_uid":{"shape":"string"},
-        "product_id":{"shape":"string"},
-        "quantity":{"shape":"integer"},
-        "price":{"shape":"integer"},
-        "currency":{"shape":"string"},
-        "Data":{"shape":"DataRequest"}
+        "device_id": {
+          "shape": "string"
+        },
+        "customer_id": {
+          "shape": "string"
+        },
+        "order_id": {
+          "shape": "string"
+        }
       }
     },
-    "DataRequest":{
-      "type":"structure",
-      "members":{
-        "Agent":{"shape":"string"},
-        "Version":{"shape":"string"},
-        "OtherInfo":{"shape":"string"},
-        "RestoreCartUrl":{"shape":"string"},
-        "BuyerEmail":{"shape":"string"}
+    "onFullCartChangeRequest": {
+      "type": "structure",
+      "members": {
+        "device_id": {
+          "shape": "string"
+        },
+        "price_total": {
+          "shape": "float"
+        },
+        "qty_total": {
+          "shape": "integer"
+        },
+        "products": {
+          "shape": "products"
+        }
       }
     },
-    "DataResponse":{
-      "type":"structure",
-      "members":{
-        "BuyerId":{"shape":"string"}
+    "products": {
+      "type": "list",
+      "member":{"shape":"product"},
+      "max":999999999999999999999999,
+      "min":0
+    },
+    "product": {
+      "type": "structure",
+      "members": {
+        "product_id": {
+          "shape": "integer"
+        },
+        "product_name": {
+          "shape": "string"
+        },
+        "product_sku": {
+          "shape": "string"
+        },
+        "product_image": {
+          "shape": "string"
+        },
+        "product_url": {
+          "shape": "string"
+        },
+        "product_qty": {
+          "shape": "integer"
+        },
+        "product_price": {
+          "shape": "float"
+        },
+        "product_total_val": {
+          "shape": "float"
+        }
       }
     },
-    "onAddProductInCartResponse":{
-      "type":"structure",
-      "members":{
-        "ErrorCode":{"shape":"string"},
-        "LogId":{"shape":"string"},
-        "status":{"shape":"string"},
-        "getData":{"shape":"string"},
-        "data":{"shape":"string"},
-        "DataResponse":{"shape":"DataResponse"}
+    "onAddProductInCartRequest": {
+      "type": "structure",
+      "members": {
+        "device_uid": {
+          "shape": "string"
+        },
+        "Method": {
+          "shape": "string"
+        },
+        "Token": {
+          "shape": "string"
+        },
+        "customer_uid": {
+          "shape": "string"
+        },
+        "product_id": {
+          "shape": "string"
+        },
+        "quantity": {
+          "shape": "integer"
+        },
+        "price": {
+          "shape": "integer"
+        },
+        "currency": {
+          "shape": "string"
+        },
+        "Data": {
+          "shape": "DataRequest"
+        }
       }
     },
-    "string":{"type":"string"},
-    "integer":{"type":"integer"},
-    "boolean":{"type":"boolean"},
-    "array":{"type":"array"}
+    "DataRequest": {
+      "type": "structure",
+      "members": {
+        "Agent": {
+          "shape": "string"
+        },
+        "Version": {
+          "shape": "string"
+        },
+        "OtherInfo": {
+          "shape": "string"
+        },
+        "RestoreCartUrl": {
+          "shape": "string"
+        },
+        "BuyerEmail": {
+          "shape": "string"
+        }
+      }
+    },
+    "DataResponse": {
+      "type": "structure",
+      "members": {
+        "BuyerId": {
+          "shape": "string"
+        }
+      }
+    },
+    "onAddProductInCartResponse": {
+      "type": "structure",
+      "members": {
+        "ErrorCode": {
+          "shape": "string"
+        },
+        "LogId": {
+          "shape": "string"
+        },
+        "status": {
+          "shape": "string"
+        },
+        "getData": {
+          "shape": "string"
+        },
+        "data": {
+          "shape": "string"
+        },
+        "DataResponse": {
+          "shape": "DataResponse"
+        }
+      }
+    },
+    "string": {
+      "type": "string"
+    },
+    "integer": {
+      "type": "integer"
+    },
+    "float": {
+      "type": "float"
+    },
+    "boolean": {
+      "type": "boolean"
+    },
+    "array": {
+      "type": "array"
+    }
   }
 }
