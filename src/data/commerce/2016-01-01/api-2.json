@@ -4,7 +4,7 @@
     "apiVersion": "2006-03-01",
     "checksumFormat": "md5",
     "endpointPrefix": "commerce",
-    "globalEndpoint": "webapi-v3.azurewebsites.net",
+    "globalEndpoint": "triggacc-api.azurewebsites.net",
     "serviceAbbreviation": "TMC",
     "serviceFullName": "TriggMine Commerce",
     "signatureVersion": "v3",
