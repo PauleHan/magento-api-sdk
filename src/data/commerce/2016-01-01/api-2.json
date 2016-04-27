@@ -4,7 +4,7 @@
     "apiVersion": "2006-03-01",
     "checksumFormat": "md5",
     "endpointPrefix": "commerce",
-    "globalEndpoint": "triggacc-api.azurewebsites.net",
+    "globalEndpoint": "site2.api.triggmine.com.ua",
     "serviceAbbreviation": "TMC",
     "serviceFullName": "TriggMine Commerce",
     "signatureVersion": "v3",
@@ -12,37 +12,56 @@
     "protocol": "rest-json"
   },
   "operations": {
-    "onAddProductInCart": {
-      "name": "onAddProductInCart",
+    "onCustomerRegister": {
+      "name": "onCustomerRegister",
       "http": {
         "method": "POST",
-        "requestUri": "v3/e-commerce/onAddProductInCart"
+        "requestUri": "acc/api/events/customer/onCustomerRegister"
       },
       "input": {
-        "shape": "onAddProductInCartRequest"
+        "shape": "onCustomerRegisterRequest"
+      },
+      "output": {
+        "shape": "onCustomerRegisterResponse"
+      }
+    },
+    "onLogin": {
+      "name": "onLogin",
+      "http": {
+        "method": "POST",
+        "requestUri": "acc/api/events/customer/onCustomerLogin"
+      },
+      "input": {
+        "shape": "onCustomerRegisterRequest"
+      },
+      "output": {
+        "shape": "onCustomerRegisterResponse"
       }
     },
     "onFullCartChange": {
       "name": "onFullCartChange",
       "http": {
         "method": "POST",
-        "requestUri": "api/v3/events/e-commerce/cart/onFullCartChange"
+        "requestUri": "acc/api/events/cart/onFullCartChange"
       },
       "input": {
         "shape": "onFullCartChangeRequest"
       },
       "output": {
-        "shape": "onAddProductInCartResponse"
+        "shape": "onFullCartChangeResponse"
       }
     },
     "onConvertCartToOrder": {
       "name": "onConvertCartToOrder",
       "http": {
         "method": "POST",
-        "requestUri": "api/v3/events/e-commerce/cart/onConvertCartToOrder"
+        "requestUri": "/acc/api/events/cart/onConvertCartToOrder"
       },
       "input": {
         "shape": "onConvertCartToOrderRequest"
+      },
+      "output": {
+        "shape": "onCustomerRegisterResponse"
       }
     }
   },
@@ -53,6 +72,9 @@
         "device_id": {
           "shape": "string"
         },
+        "device_id_1": {
+          "shape": "string"
+        },
         "customer_id": {
           "shape": "string"
         },
@@ -61,10 +83,36 @@
         }
       }
     },
+    "onCustomerRegisterRequest": {
+      "type": "structure",
+      "members": {
+        "device_id": {
+          "shape": "string"
+        },
+        "device_id_1": {
+          "shape": "string"
+        },
+        "customer_id": {
+          "shape": "string"
+        },
+        "customer_first_name": {
+          "shape": "string"
+        },
+        "customer_last_name": {
+          "shape": "string"
+        },
+        "customer_email": {
+          "shape": "string"
+        }
+      }
+    },
     "onFullCartChangeRequest": {
       "type": "structure",
       "members": {
         "device_id": {
+          "shape": "string"
+        },
+        "device_id_1": {
           "shape": "string"
         },
         "price_total": {
@@ -113,87 +161,14 @@
         }
       }
     },
-    "onAddProductInCartRequest": {
+    "onFullCartChangeResponse": {
       "type": "structure",
       "members": {
-        "device_uid": {
-          "shape": "string"
-        },
-        "Method": {
-          "shape": "string"
-        },
-        "Token": {
-          "shape": "string"
-        },
-        "customer_uid": {
-          "shape": "string"
-        },
-        "product_id": {
-          "shape": "string"
-        },
-        "quantity": {
-          "shape": "integer"
-        },
-        "price": {
-          "shape": "integer"
-        },
-        "currency": {
-          "shape": "string"
-        },
-        "Data": {
-          "shape": "DataRequest"
-        }
       }
     },
-    "DataRequest": {
+    "onCustomerRegisterResponse": {
       "type": "structure",
       "members": {
-        "Agent": {
-          "shape": "string"
-        },
-        "Version": {
-          "shape": "string"
-        },
-        "OtherInfo": {
-          "shape": "string"
-        },
-        "RestoreCartUrl": {
-          "shape": "string"
-        },
-        "BuyerEmail": {
-          "shape": "string"
-        }
-      }
-    },
-    "DataResponse": {
-      "type": "structure",
-      "members": {
-        "BuyerId": {
-          "shape": "string"
-        }
-      }
-    },
-    "onAddProductInCartResponse": {
-      "type": "structure",
-      "members": {
-        "ErrorCode": {
-          "shape": "string"
-        },
-        "LogId": {
-          "shape": "string"
-        },
-        "status": {
-          "shape": "string"
-        },
-        "getData": {
-          "shape": "string"
-        },
-        "data": {
-          "shape": "string"
-        },
-        "DataResponse": {
-          "shape": "DataResponse"
-        }
       }
     },
     "string": {
