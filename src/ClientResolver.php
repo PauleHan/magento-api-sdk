@@ -50,7 +50,7 @@ class ClientResolver
         'scheme' => [
             'type'     => 'value',
             'valid'    => ['string'],
-            'default'  => 'https',
+            'default'  => 'http',
             'doc'      => 'URI scheme to use when connecting connect. The SDK will utilize "https" endpoints (i.e., utilize SSL/TLS connections) by default. You can attempt to connect to a service over an unencrypted "http" endpoint by setting ``scheme`` to "http".',
         ],
         'endpoint' => [
