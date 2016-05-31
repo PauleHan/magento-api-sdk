@@ -5,8 +5,7 @@
       "endpoint": "api.triggmine.com/{service}"
     },
     "*/commerce": {
-      "endpoint": "site2.api.triggmine.com.ua"
+      "endpoint": "m1-api.triggmine.com.ua"
     }
   }
 }
-
