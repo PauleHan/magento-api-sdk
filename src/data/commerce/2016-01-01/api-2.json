@@ -4,7 +4,7 @@
     "apiVersion": "2006-03-01",
     "checksumFormat": "md5",
     "endpointPrefix": "commerce",
-    "globalEndpoint": "site2.api.triggmine.com.ua",
+    "globalEndpoint": "m1-api.triggmine.com.ua",
     "serviceAbbreviation": "TMC",
     "serviceFullName": "TriggMine Commerce",
     "signatureVersion": "v3",
@@ -164,6 +164,9 @@
     "onFullCartChangeResponse": {
       "type": "structure",
       "members": {
+        "status": {
+          "shape": "string"
+        }
       }
     },
     "onCustomerRegisterResponse": {
