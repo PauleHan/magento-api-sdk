@@ -38,6 +38,19 @@
         "shape": "onCustomerRegisterResponse"
       }
     },
+    "onLogout": {
+      "name": "onLogout",
+      "http": {
+        "method": "POST",
+        "requestUri": "acc/api/events/customer/onCustomerLogout"
+      },
+      "input": {
+        "shape": "onCustomerRegisterRequest"
+      },
+      "output": {
+        "shape": "onCustomerRegisterResponse"
+      }
+    },
     "onFullCartChange": {
       "name": "onFullCartChange",
       "http": {
@@ -63,7 +76,34 @@
       "output": {
         "shape": "onCustomerRegisterResponse"
       }
+    },
+    "onDiagnosticInformationUpdated": {
+      "name": "onDiagnosticInformationUpdated",
+      "http": {
+        "method": "POST",
+        "requestUri": "control/api/plugin/onDiagnosticInformationUpdated"
+      },
+      "input": {
+        "shape": "onDiagnosticInformationUpdatedRequest"
+      },
+      "output": {
+        "shape": "onDiagnosticInformationUpdatedResponse"
+      }
+    },
+    "onPageInit": {
+      "name": "onPageInit",
+      "http": {
+        "method": "POST",
+        "requestUri": "acc/api/events/customer/onPageInit"
+      },
+      "input": {
+        "shape": "onPageInitRequest"
+      },
+      "output": {
+        "shape": "onPageInitResponse"
+      }
     }
+    
   },
   "shapes": {
     "onConvertCartToOrderRequest": {
@@ -123,6 +163,59 @@
         },
         "products": {
           "shape": "products"
+        }
+      }
+    },
+    "onDiagnosticInformationUpdatedRequest": {
+        "type": "structure",
+        "members": {
+          "dateCreated": {
+            "shape": "string"
+          },
+          "diagnosticType": {
+            "shape": "string"
+          },
+          "description": {
+            "shape": "string"
+          },
+          "status": {
+            "shape": "string"
+          }
+        }
+    },
+    "onDiagnosticInformationUpdatedResponse": {
+      "type": "structure",
+      "members": {
+        "status": {
+          "shape": "string"
+        }
+      }
+    },
+    "onPageInitRequest": {
+        "type": "structure",
+        "members": {
+          "device_id": {
+            "shape": "string"
+          },
+          "device_id_1": {
+            "shape": "string"
+          },
+          "user_agent": {
+            "shape": "string"
+          },
+          "referrer": {
+            "shape": "string"
+          },
+          "location": {
+            "shape": "string"
+          }
+        }
+    },
+    "onPageInitResponse": {
+      "type": "structure",
+      "members": {
+        "status": {
+          "shape": "string"
         }
       }
     },
