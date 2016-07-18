@@ -1,0 +1,223 @@
+{
+  "version": "3.0",
+  "metadata": {
+    "apiVersion": "2016-07-01",
+    "checksumFormat": "md5",
+    "endpointPrefix": "commerce",
+    "globalEndpoint": "m1-api.triggmine.com.ua",
+    "serviceAbbreviation": "TMC",
+    "serviceFullName": "TriggMine Commerce",
+    "signatureVersion": "v3",
+    "timestampFormat": "iso8601",
+    "protocol": "rest-json"
+  },
+  "operations": {
+    "onCustomerRegister": {
+      "name": "onCustomerRegister",
+      "http": {
+        "method": "POST",
+        "requestUri": "acc/api/events/customer/onCustomerRegister"
+      },
+      "input": {
+        "shape": "onCustomerRegisterRequest"
+      },
+      "output": {
+        "shape": "onCustomerRegisterResponse"
+      }
+    },
+    "onLogin": {
+      "name": "onLogin",
+      "http": {
+        "method": "POST",
+        "requestUri": "acc/api/events/customer/onCustomerLogin"
+      },
+      "input": {
+        "shape": "onCustomerRegisterRequest"
+      },
+      "output": {
+        "shape": "onCustomerRegisterResponse"
+      }
+    },
+    "onFullCartChange": {
+      "name": "onFullCartChange",
+      "http": {
+        "method": "POST",
+        "requestUri": "acc/api/events/cart/onFullCartChange"
+      },
+      "input": {
+        "shape": "onFullCartChangeRequest"
+      },
+      "output": {
+        "shape": "onFullCartChangeResponse"
+      }
+    },
+    "onConvertCartToOrder": {
+      "name": "onConvertCartToOrder",
+      "http": {
+        "method": "POST",
+        "requestUri": "/acc/api/events/cart/onConvertCartToOrder"
+      },
+      "input": {
+        "shape": "onConvertCartToOrderRequest"
+      },
+      "output": {
+        "shape": "onCustomerRegisterResponse"
+      }
+    },
+    "onDiagnosticInformationUpdated": {
+      "name": "onDiagnosticInformationUpdated",
+      "http": {
+        "method": "POST",
+        "requestUri": "acc/api/plugin/onDiagnosticInformationUpdated"
+      },
+      "input": {
+        "shape": "onDiagnosticInformationUpdatedRequest"
+      },
+      "output": {
+        "shape": "onDiagnosticInformationUpdatedResponse"
+      }
+    },
+  },
+  "shapes": {
+    "onConvertCartToOrderRequest": {
+      "type": "structure",
+      "members": {
+        "device_id": {
+          "shape": "string"
+        },
+        "device_id_1": {
+          "shape": "string"
+        },
+        "customer_id": {
+          "shape": "string"
+        },
+        "order_id": {
+          "shape": "string"
+        }
+      }
+    },
+    "onCustomerRegisterRequest": {
+      "type": "structure",
+      "members": {
+        "device_id": {
+          "shape": "string"
+        },
+        "device_id_1": {
+          "shape": "string"
+        },
+        "customer_id": {
+          "shape": "string"
+        },
+        "customer_first_name": {
+          "shape": "string"
+        },
+        "customer_last_name": {
+          "shape": "string"
+        },
+        "customer_email": {
+          "shape": "string"
+        }
+      }
+    },
+    "onFullCartChangeRequest": {
+      "type": "structure",
+      "members": {
+        "device_id": {
+          "shape": "string"
+        },
+        "device_id_1": {
+          "shape": "string"
+        },
+        "price_total": {
+          "shape": "float"
+        },
+        "qty_total": {
+          "shape": "integer"
+        },
+        "products": {
+          "shape": "products"
+        }
+      }
+    },
+  "onDiagnosticInformationUpdatedRequest": {
+        "type": "structure",
+        "members": {
+          "DateCreated": {
+            "shape": "string"
+          },
+          "DiagnosticType": {
+            "shape": "string"
+          },
+          "Description": {
+            "shape": "string"
+          },
+          "Status": {
+            "shape": "string"
+          }
+        }
+    },
+    "products": {
+      "type": "list",
+      "member":{"shape":"product"},
+      "max":999999999999999999999999,
+      "min":0
+    },
+    "product": {
+      "type": "structure",
+      "members": {
+        "product_id": {
+          "shape": "integer"
+        },
+        "product_name": {
+          "shape": "string"
+        },
+        "product_sku": {
+          "shape": "string"
+        },
+        "product_image": {
+          "shape": "string"
+        },
+        "product_url": {
+          "shape": "string"
+        },
+        "product_qty": {
+          "shape": "integer"
+        },
+        "product_price": {
+          "shape": "float"
+        },
+        "product_total_val": {
+          "shape": "float"
+        }
+      }
+    },
+    "onFullCartChangeResponse": {
+      "type": "structure",
+      "members": {
+        "status": {
+          "shape": "string"
+        }
+      }
+    },
+    "onCustomerRegisterResponse": {
+      "type": "structure",
+      "members": {
+      }
+    },
+    "string": {
+      "type": "string"
+    },
+    "integer": {
+      "type": "integer"
+    },
+    "float": {
+      "type": "float"
+    },
+    "boolean": {
+      "type": "boolean"
+    },
+    "array": {
+      "type": "array"
+    }
+  }
+}
