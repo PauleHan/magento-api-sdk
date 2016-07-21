@@ -1,7 +1,7 @@
 {
-  "version": "2.0",
+  "version": "3.0",
   "metadata": {
-    "apiVersion": "2006-03-01",
+    "apiVersion": "2016-07-01",
     "checksumFormat": "md5",
     "endpointPrefix": "commerce",
     "globalEndpoint": "m1-api.triggmine.com.ua",
@@ -30,19 +30,6 @@
       "http": {
         "method": "POST",
         "requestUri": "acc/api/events/customer/onCustomerLogin"
-      },
-      "input": {
-        "shape": "onCustomerRegisterRequest"
-      },
-      "output": {
-        "shape": "onCustomerRegisterResponse"
-      }
-    },
-    "onLogout": {
-      "name": "onLogout",
-      "http": {
-        "method": "POST",
-        "requestUri": "acc/api/events/customer/onCustomerLogout"
       },
       "input": {
         "shape": "onCustomerRegisterRequest"
@@ -81,7 +68,7 @@
       "name": "onDiagnosticInformationUpdated",
       "http": {
         "method": "POST",
-        "requestUri": "control/api/plugin/onDiagnosticInformationUpdated"
+        "requestUri": "acc/api/plugin/onDiagnosticInformationUpdated"
       },
       "input": {
         "shape": "onDiagnosticInformationUpdatedRequest"
@@ -90,20 +77,6 @@
         "shape": "onDiagnosticInformationUpdatedResponse"
       }
     },
-    "onPageInit": {
-      "name": "onPageInit",
-      "http": {
-        "method": "POST",
-        "requestUri": "acc/api/events/customer/onPageInit"
-      },
-      "input": {
-        "shape": "onPageInitRequest"
-      },
-      "output": {
-        "shape": "onPageInitResponse"
-      }
-    }
-    
   },
   "shapes": {
     "onConvertCartToOrderRequest": {
@@ -166,58 +139,22 @@
         }
       }
     },
-    "onDiagnosticInformationUpdatedRequest": {
+  "onDiagnosticInformationUpdatedRequest": {
         "type": "structure",
         "members": {
-          "dateCreated": {
+          "DateCreated": {
             "shape": "string"
           },
-          "diagnosticType": {
+          "DiagnosticType": {
             "shape": "string"
           },
-          "description": {
+          "Description": {
             "shape": "string"
           },
-          "status": {
+          "Status": {
             "shape": "string"
           }
         }
-    },
-    "onDiagnosticInformationUpdatedResponse": {
-      "type": "structure",
-      "members": {
-        "status": {
-          "shape": "string"
-        }
-      }
-    },
-    "onPageInitRequest": {
-        "type": "structure",
-        "members": {
-          "device_id": {
-            "shape": "string"
-          },
-          "device_id_1": {
-            "shape": "string"
-          },
-          "user_agent": {
-            "shape": "string"
-          },
-          "referrer": {
-            "shape": "string"
-          },
-          "location": {
-            "shape": "string"
-          }
-        }
-    },
-    "onPageInitResponse": {
-      "type": "structure",
-      "members": {
-        "status": {
-          "shape": "string"
-        }
-      }
     },
     "products": {
       "type": "list",

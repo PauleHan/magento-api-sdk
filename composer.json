@@ -18,7 +18,7 @@
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/Bladejakal/triggmine-api-bluprint"
+      "url": "https://github.com/PauleHan/magento-api-sdk.git"
     }
   ],
   "require": {
