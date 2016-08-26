@@ -16,7 +16,7 @@
       "name": "onCustomerRegister",
       "http": {
         "method": "POST",
-        "requestUri": "acc/api/events/customer/onCustomerRegister"
+        "requestUri": "api/events/prospect/registration"
       },
       "input": {
         "shape": "onCustomerRegisterRequest"
@@ -29,33 +29,33 @@
       "name": "onLogin",
       "http": {
         "method": "POST",
-        "requestUri": "acc/api/events/customer/onCustomerLogin"
+        "requestUri": "api/events/prospect/login"
       },
       "input": {
         "shape": "onCustomerRegisterRequest"
       },
       "output": {
-        "shape": "onCustomerRegisterResponse"
+        "shape": "onLoginResponse"
       }
     },
     "onLogout": {
       "name": "onLogout",
       "http": {
         "method": "POST",
-        "requestUri": "acc/api/events/customer/onCustomerLogout"
+        "requestUri": "api/events/prospect/logout"
       },
       "input": {
         "shape": "onCustomerRegisterRequest"
       },
       "output": {
-        "shape": "onCustomerRegisterResponse"
+        "shape": "onLogoutResponse"
       }
     },
     "onFullCartChange": {
       "name": "onFullCartChange",
       "http": {
         "method": "POST",
-        "requestUri": "acc/api/events/cart/onFullCartChange"
+        "requestUri": "api/events/cart"
       },
       "input": {
         "shape": "onFullCartChangeRequest"
@@ -68,13 +68,13 @@
       "name": "onConvertCartToOrder",
       "http": {
         "method": "POST",
-        "requestUri": "/acc/api/events/cart/onConvertCartToOrder"
+        "requestUri": "api/events/order"
       },
       "input": {
         "shape": "onConvertCartToOrderRequest"
       },
       "output": {
-        "shape": "onCustomerRegisterResponse"
+        "shape": "onConvertCartToOrderResponse"
       }
     },
     "onDiagnosticInformationUpdated": {
@@ -94,7 +94,7 @@
       "name": "onPageInit",
       "http": {
         "method": "POST",
-        "requestUri": "acc/api/events/customer/onPageInit"
+        "requestUri": "api/events/navigation"
       },
       "input": {
         "shape": "onPageInitRequest"
@@ -119,6 +119,26 @@
           "shape": "string"
         },
         "order_id": {
+          "shape": "string"
+        },
+        "status": {
+          "shape": "string"
+        },
+        "price_total": {
+          "shape": "float"
+        },
+        "qty_total": {
+          "shape": "integer"
+        },
+        "products": {
+          "shape": "products"
+        }
+      }
+    },
+    "onConvertCartToOrderResponse": {
+      "type": "structure",
+      "members": {
+        "status": {
           "shape": "string"
         }
       }
@@ -146,6 +166,30 @@
         }
       }
     },
+    "onCustomerRegisterResponse": {
+      "type": "structure",
+      "members": {
+        "status": {
+          "shape": "string"
+        }
+      }
+    },
+    "onLoginResponse": {
+      "type": "structure",
+      "members": {
+        "status": {
+          "shape": "string"
+        }
+      }
+    },
+    "onLogoutResponse": {
+      "type": "structure",
+      "members": {
+        "status": {
+          "shape": "string"
+        }
+      }
+    },
     "onFullCartChangeRequest": {
       "type": "structure",
       "members": {
@@ -153,6 +197,12 @@
           "shape": "string"
         },
         "device_id_1": {
+          "shape": "string"
+        },
+        "prospect_id": {
+          "shape": "string"
+        },
+        "order_id": {
           "shape": "string"
         },
         "price_total": {
@@ -163,6 +213,14 @@
         },
         "products": {
           "shape": "products"
+        }
+      }
+    },
+    "onFullCartChangeResponse": {
+      "type": "structure",
+      "members": {
+        "status": {
+          "shape": "string"
         }
       }
     },
@@ -200,14 +258,14 @@
           "device_id_1": {
             "shape": "string"
           },
+          "prospect_id": {
+            "shape": "string"
+          },
           "user_agent": {
             "shape": "string"
           },
-          "referrer": {
-            "shape": "string"
-          },
-          "location": {
-            "shape": "string"
+          "product": {
+            "shape": "products"
           }
         }
     },
@@ -234,6 +292,9 @@
         "product_name": {
           "shape": "string"
         },
+        "product_desc": {
+          "shape": "string"
+        },
         "product_sku": {
           "shape": "string"
         },
@@ -251,21 +312,17 @@
         },
         "product_total_val": {
           "shape": "float"
+        },
+        "product_categories": {
+          "shape": "categories"
         }
       }
     },
-    "onFullCartChangeResponse": {
-      "type": "structure",
-      "members": {
-        "status": {
-          "shape": "string"
-        }
-      }
-    },
-    "onCustomerRegisterResponse": {
-      "type": "structure",
-      "members": {
-      }
+    "categories": {
+      "type": "list",
+      "member":{"shape":"string"},
+      "max":999,
+      "min":0
     },
     "string": {
       "type": "string"
